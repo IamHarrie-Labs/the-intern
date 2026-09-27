@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#F3EBDD;}
+  a{color:#1F6B4F;}
+  a:hover{color:#164f3a;}
+  @keyframes hopA{0%{transform:translate(-50%,-50%) scale(1);}35%{transform:translate(-50%,-62%) scale(1.06);}100%{transform:translate(-50%,-50%) scale(1);}}
+  @keyframes hopB{0%{transform:translate(-50%,-50%) scale(1);}35%{transform:translate(-50%,-62%) scale(1.06);}100%{transform:translate(-50%,-50%) scale(1);}}
+  @keyframes pulseA{0%{transform:scale(1);}30%{transform:scale(1.012);}100%{transform:scale(1);}}
+  @keyframes pulseB{0%{transform:scale(1);}30%{transform:scale(1.012);}100%{transform:scale(1);}}
+  @keyframes popA{0%{opacity:0;transform:translate(-50%,-40%);}20%{opacity:1;transform:translate(-50%,-70%);}100%{opacity:0;transform:translate(-50%,-130%);}}
+  @keyframes popB{0%{opacity:0;transform:translate(-50%,-40%);}20%{opacity:1;transform:translate(-50%,-70%);}100%{opacity:0;transform:translate(-50%,-130%);}}
+  @media (prefers-reduced-motion: reduce){*{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;}}
+</style>
+</helmet>
+<div style="font-family:'IBM Plex Sans',sans-serif;color:#19201D;max-width:1180px;margin:0 auto;padding:20px 20px 64px;">
+
+  <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.12em;color:#1F6B4F;font-weight:600;">THE INTERN</div>
+      <div style="font-size:13px;color:#5D655F;margin-top:2px;">a game about measuring the wrong thing</div>
+    </div>
+    <button onClick="{{ reopenTour }}" style="min-height:44px;padding:10px 16px;background:#FFFAF0;border:1px solid #CFC4B3;border-radius:8px;color:#19201D;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">Show tutorial</button>
+  </div>
+
+  <div style="background:#FFFAF0;border:1px solid #CFC4B3;border-radius:12px;padding:18px 20px;box-shadow:0 2px 0 rgba(25,32,29,0.05);margin-bottom:20px;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#1F6B4F;font-weight:700;margin-bottom:6px;">ASSIGNMENT #001 — THE PARCEL</div>
+    <div style="font-size:22px;font-weight:600;">Get the parcel to Dana's desk.</div>
+    <div style="font-size:13px;color:#5D655F;margin-top:6px;">The Intern doesn't understand that sentence. It only sees the scorecard you build below.</div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:20px;">
+
+    <div ref="{{ setOfficeRef }}" style="flex:2 1 420px;background:#FFFAF0;border:1px solid #CFC4B3;border-radius:12px;padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#1F6B4F;font-weight:700;">OFFICE — LIVE FEED</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5D655F;">ACTION {{ actionDisplay }}/18</div>
+      </div>
+
+      <div style="{{ gridWrapStyle }}">
+        <div style="position:relative;width:100%;aspect-ratio:6/5;background:#E7DDCC;border:1px solid #CFC4B3;border-radius:8px;overflow:hidden;">
+          <sc-for list="{{ cells }}" as="cell" hint-placeholder-count="30">
+            <div style="{{ cell.style }}">
+              <sc-if value="{{ cell.isDesk }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;bottom:4%;left:6%;right:6%;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.04em;color:#1F6B4F;font-weight:700;line-height:1.2;">DANA'S DESK</div>
+              </sc-if>
+            </div>
+          </sc-for>
+
+          <sc-if value="{{ showParcel }}" hint-placeholder-val="{{ true }}">
+            <div style="{{ parcelStyle }}">
+              <div style="position:absolute;left:0;right:0;top:44%;height:12%;background:#CFC4B3;"></div>
+              <div style="position:absolute;top:0;bottom:0;left:44%;width:12%;background:#CFC4B3;"></div>
+            </div>
+          </sc-if>
+
+          <div style="{{ internStyle }}">
+            <div style="position:absolute;left:22%;top:24%;width:14%;height:14%;background:#19201D;border-radius:50%;"></div>
+            <div style="position:absolute;right:22%;top:24%;width:14%;height:14%;background:#19201D;border-radius:50%;"></div>
+            <div style="position:absolute;left:50%;bottom:6%;transform:translateX(-50%);background:#FFFAF0;color:#19201D;font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:700;letter-spacing:0.05em;padding:1px 5px;border-radius:6px;border:1px solid #19201D;white-space:nowrap;">INTERN</div>
+            <sc-if value="{{ isCarrying }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;right:-8%;top:-8%;width:28%;height:28%;background:#E7DDCC;border:2px solid #19201D;border-radius:4px;"></div>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{ showPop }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ popStyle }}">{{ popText }}</div>
+          </sc-if>
+        </div>
+      </div>
+
+      <div aria-live="polite" style="margin-top:12px;min-height:22px;font-size:14px;color:#19201D;">{{ statusNote }}</div>
+
+      <sc-if value="{{ phaseIsPlaying }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ skipPlayback }}" style="margin-top:8px;min-height:40px;padding:8px 14px;background:#FFFAF0;border:1px solid #CFC4B3;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">Skip to result</button>
+      </sc-if>
+    </div>
+
+    <div ref="{{ setScorecardRef }}" style="flex:1 1 320px;background:#FFFAF0;border:1px solid #CFC4B3;border-radius:12px;padding:16px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#1F6B4F;font-weight:700;margin-bottom:12px;">SCORECARD</div>
+
+      <sc-for list="{{ sensorList }}" as="s" hint-placeholder-count="3">
+        <div style="border:1px solid #CFC4B3;border-radius:10px;padding:12px;margin-bottom:10px;background:#FFFAF0;">
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <input type="checkbox" id="{{ s.inputId }}" checked="{{ s.enabled }}" onChange="{{ s.onToggle }}" disabled="{{ s.locked }}" style="width:20px;height:20px;margin-top:2px;flex:0 0 auto;"/>
+            <div style="flex:1 1 auto;min-width:0;">
+              <label for="{{ s.inputId }}" style="font-weight:600;font-size:14px;cursor:pointer;display:flex;justify-content:space-between;gap:8px;">
+                <span>{{ s.name }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5D655F;font-weight:600;white-space:nowrap;">{{ s.costLabel }}</span>
+              </label>
+              <div style="font-size:12px;color:#5D655F;margin-top:2px;">{{ s.desc }}</div>
+              <sc-if value="{{ s.enabled }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+                  <input type="range" min="-5" max="5" step="1" value="{{ s.weight }}" onChange="{{ s.onWeightChange }}" aria-label="{{ s.weightAriaLabel }}" disabled="{{ s.locked }}" style="flex:1 1 auto;accent-color:#E9652C;"/>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;width:34px;text-align:right;">{{ s.weightLabel }}</div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+
+      <div ref="{{ setBudgetRef }}" style="margin-top:4px;padding:12px;border:1px solid #CFC4B3;border-radius:10px;">
+        <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;">
+          <span>BUDGET</span><span>{{ usedBudget }}/3</span>
+        </div>
+        <div style="display:flex;gap:4px;margin-top:8px;">
+          <sc-for list="{{ budgetDots }}" as="dot" hint-placeholder-count="3">
+            <div style="{{ dot.style }}"></div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ overBudget }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:8px;font-size:12px;color:#A93F32;font-weight:600;">Over budget by {{ overBudgetAmount }}. Turn off a sensor to continue.</div>
+        </sc-if>
+      </div>
+
+      <button ref="{{ setStartRef }}" onClick="{{ onStartClick }}" disabled="{{ startDisabled }}" style="{{ startButtonStyle }}">{{ startButtonLabel }}</button>
+    </div>
+  </div>
+
+  <sc-if value="{{ phaseIsResult }}" hint-placeholder-val="{{ false }}">
+    <div style="margin-top:22px;">
+      <div style="{{ awardCardStyle }}">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;font-weight:700;opacity:0.85;">{{ awardKicker }}</div>
+        <div style="font-size:26px;font-weight:700;margin-top:4px;">{{ resultTitle }}</div>
+        <div style="font-size:14px;margin-top:6px;opacity:0.9;">{{ resultSubtitle }}</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px;">
+        <div style="background:#FFFAF0;border:1px solid #CFC4B3;border-radius:10px;padding:16px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#5D655F;font-weight:700;">YOUR SCORECARD SAYS</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:700;margin-top:6px;">{{ scoreDisplay }}</div>
+          <div style="margin-top:8px;">
+            <sc-for list="{{ scoreBreakdown }}" as="row" hint-placeholder-count="1">
+              <div style="font-size:12px;color:#5D655F;display:flex;justify-content:space-between;padding:3px 0;">
+                <span>{{ row.label }} × {{ row.count }}</span><span style="font-family:'IBM Plex Mono',monospace;">{{ row.subtotalLabel }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:#FFFAF0;border:1px solid #CFC4B3;border-radius:10px;padding:16px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#5D655F;font-weight:700;">WHAT ACTUALLY HAPPENED</div>
+          <div style="font-size:15px;font-weight:600;margin-top:8px;">{{ outcomeLine1 }}</div>
+          <div style="font-size:13px;color:#5D655F;margin-top:4px;">{{ outcomeLine2 }}</div>
+        </div>
+        <div style="background:#FFFAF0;border:1px solid #CFC4B3;border-radius:10px;padding:16px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#5D655F;font-weight:700;">DEBRIEF</div>
+          <div style="font-size:13px;margin-top:8px;line-height:1.5;">{{ debrief }}</div>
+          <button onClick="{{ adjustScorecard }}" style="margin-top:14px;min-height:44px;width:100%;padding:10px 14px;background:#19201D;color:#FFFAF0;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">Adjust Scorecard</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasHistory }}" hint-placeholder-val="{{ false }}">
+    <div style="margin-top:32px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#E9652C;font-weight:700;margin-bottom:10px;">INTERN OF THE MONTH WALL</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
+        <sc-for list="{{ history }}" as="h" hint-placeholder-count="2">
+          <div style="background:#FFFAF0;border:1px solid #CFC4B3;border-radius:10px;padding:12px;">
+            <div style="font-weight:700;font-size:13px;color:#E9652C;">{{ h.title }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5D655F;margin-top:4px;">{{ h.summary }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="margin-top:36px;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#5D655F;font-weight:700;margin-bottom:10px;">WHAT'S NEXT</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;">
+      <div style="flex:1 1 260px;background:#E7DDCC;border:1px solid #CFC4B3;border-radius:12px;padding:16px;opacity:0.75;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:16px;height:20px;border:2px solid #19201D;border-radius:3px;position:relative;flex:0 0 auto;"><div style="position:absolute;left:2px;right:2px;top:-9px;height:12px;border:2px solid #19201D;border-bottom:none;border-radius:8px 8px 0 0;"></div></div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.06em;">LEVEL 2 — TIDY OFFICE</div>
+        </div>
+        <div style="font-size:12px;color:#5D655F;margin-top:8px;">Make the office genuinely tidy, using sensors that only measure part of the room.</div>
+      </div>
+      <div style="flex:1 1 260px;background:#E7DDCC;border:1px solid #CFC4B3;border-radius:12px;padding:16px;opacity:0.75;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:16px;height:20px;border:2px solid #19201D;border-radius:3px;position:relative;flex:0 0 auto;"><div style="position:absolute;left:2px;right:2px;top:-9px;height:12px;border:2px solid #19201D;border-bottom:none;border-radius:8px 8px 0 0;"></div></div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.06em;">LEVEL 3 — THE FAR DESK</div>
+        </div>
+        <div style="font-size:12px;color:#5D655F;margin-top:8px;">Deliver to three colleagues. Test Day moves one desk much farther away.</div>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ tourActive }}" hint-placeholder-val="{{ false }}">
+    <div style="{{ spotlightStyle }}"></div>
+    <div style="position:fixed;left:16px;right:16px;bottom:20px;max-width:480px;margin:0 auto;background:#19201D;color:#FFFAF0;border-radius:12px;padding:16px 18px;z-index:9999;box-shadow:0 8px 30px rgba(0,0,0,0.35);">
+      <div style="display:flex;gap:5px;margin-bottom:8px;">
+        <sc-for list="{{ tourDots }}" as="td" hint-placeholder-count="4">
+          <div style="{{ td.style }}"></div>
+        </sc-for>
+      </div>
+      <div style="font-size:14px;line-height:1.5;">{{ tourText }}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
+        <button onClick="{{ skipTour }}" style="background:none;border:none;color:#CFC4B3;font-size:13px;cursor:pointer;min-height:44px;">Skip tour</button>
+        <button onClick="{{ nextTourStep }}" style="min-height:44px;padding:10px 18px;background:#E9652C;color:#19201D;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;">{{ tourButtonLabel }}</button>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.cols = 6; this.rows = 5;
+    this.wallSet = new Set(['3,1','3,2','3,3']);
+    this.desk = { x: 5, y: 0 };
+    this.start = { x: 1, y: 3 };
+    this.tourTargets = ['office','scorecard','budget','start'];
+    this.tourTexts = [
+      "This is the office. The Intern can only see positions and walls — not what you actually want.",
+      "Sensors are what the Intern gets scored on. Switch one on to give it something to optimize.",
+      "You've got 3 budget points. Every sensor you switch on spends some of it.",
+      "Hit Start Shift. The Intern will find the highest-scoring plan it can — whether or not it's the plan you meant."
+    ];
+    this.reducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    this.cells = [];
+    for (let y = 0; y < this.rows; y++) {
+      for (let x = 0; x < this.cols; x++) {
+        const isWall = this.wallSet.has(x + ',' + y);
+        const isDesk = x === this.desk.x && y === this.desk.y;
+        const left = (x / this.cols) * 100, top = (y / this.rows) * 100;
+        const w = 100 / this.cols, h = 100 / this.rows;
+        let bg = '#E7DDCC';
+        if (isWall) bg = 'repeating-linear-gradient(45deg,#5D655F 0 6px,#CFC4B3 6px 12px)';
+        if (isDesk) bg = '#FFFAF0';
+        const border = isDesk ? '2px solid #1F6B4F' : '1px solid #CFC4B3';
+        this.cells.push({
+          key: x + '-' + y, x, y, isWall, isDesk,
+          style: `position:absolute;left:${left}%;top:${top}%;width:${w}%;height:${h}%;box-sizing:border-box;border:${border};background:${bg};`
+        });
+      }
+    }
+
+    this.state = {
+      sensors: {
+        hand: { enabled: true, weight: 3, cost: 1, name: 'Hand sensor', desc: 'Measures every parcel pickup.' },
+        desk: { enabled: false, weight: 4, cost: 2, name: 'Desk scale', desc: "Measures every time the parcel lands on Dana's desk." },
+        step: { enabled: false, weight: -1, cost: 1, name: 'Step counter', desc: 'Measures every valid grid movement.' }
+      },
+      phase: 'setup',
+      plan: null,
+      playIndex: -1,
+      tourActive: true,
+      tourStep: 0,
+      history: []
+    };
+  }
+
+  componentDidMount() {
+    this._onResize = () => this.forceUpdate();
+    window.addEventListener('resize', this._onResize);
+    this.forceUpdate();
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._onResize);
+    if (this._timer) clearTimeout(this._timer);
+  }
+
+  toggleSensor(id) {
+    if (this.state.phase !== 'setup') return;
+    this.setState(s => ({ sensors: { ...s.sensors, [id]: { ...s.sensors[id], enabled: !s.sensors[id].enabled } } }));
+  }
+  setWeight(id, v) {
+    if (this.state.phase !== 'setup') return;
+    this.setState(s => ({ sensors: { ...s.sensors, [id]: { ...s.sensors[id], weight: v } } }));
+  }
+
+  computePlan(sensors) {
+    const cols = this.cols, rows = this.rows, wallSet = this.wallSet, desk = this.desk, start = this.start;
+    const actionsOrder = ['interact', 'N', 'E', 'S', 'W', 'wait'];
+    const dirs = { N: [0, -1], E: [1, 0], S: [0, 1], W: [-1, 0] };
+    const dirName = { N: 'north', E: 'east', S: 'south', W: 'west' };
+    const isWall = (x, y) => x < 0 || x >= cols || y < 0 || y >= rows || wallSet.has(x + ',' + y);
+    const key = (rx, ry, c, px, py) => rx + ',' + ry + ',' + (c ? 1 : 0) + ',' + px + ',' + py;
+    const memo = new Array(19);
+    for (let r = 0; r <= 18; r++) memo[r] = new Map();
+
+    const getVal = (rx, ry, c, px, py, rem) => {
+      if (rem === 0) return 0;
+      const k = key(rx, ry, c, px, py);
+      const cached = memo[rem].get(k);
+      if (cached) return cached.value;
+      let best = -Infinity, bestAction = null;
+      for (const act of actionsOrder) {
+        let reward = 0, nrx = rx, nry = ry, nc = c, npx = px, npy = py;
+        if (act === 'interact') {
+          if (c) {
+            nc = false; npx = rx; npy = ry;
+            if (sensors.desk.enabled && rx === desk.x && ry === desk.y) reward = sensors.desk.weight;
+          } else if (rx === px && ry === py) {
+            nc = true;
+            if (sensors.hand.enabled) reward = sensors.hand.weight;
+          }
+        } else if (act === 'wait') {
+          reward = 0;
+        } else {
+          const [dx, dy] = dirs[act];
+          const tx = rx + dx, ty = ry + dy;
+          if (!isWall(tx, ty)) {
+            nrx = tx; nry = ty;
+            if (c) { npx = tx; npy = ty; }
+            if (sensors.step.enabled) reward = sensors.step.weight;
+          }
+        }
+        const total = reward + getVal(nrx, nry, nc, npx, npy, rem - 1);
+        if (total > best) { best = total; bestAction = { act, reward, nrx, nry, nc, npx, npy }; }
+      }
+      memo[rem].set(k, { value: best, action: bestAction });
+      return best;
+    };
+
+    getVal(start.x, start.y, false, start.x, start.y, 18);
+
+    let rx = start.x, ry = start.y, c = false, px = start.x, py = start.y;
+    const steps = [];
+    let totalScore = 0, pickups = 0, deliveries = 0, movesCount = 0;
+    for (let rem = 18; rem >= 1; rem--) {
+      const entry = memo[rem].get(key(rx, ry, c, px, py));
+      const a = entry.action;
+      totalScore += a.reward;
+      let note = '';
+      if (a.act === 'interact') {
+        if (!c && rx === px && ry === py) {
+          pickups++;
+          note = sensors.hand.enabled ? `Hand sensor: parcel picked up. ${a.reward >= 0 ? '+' : ''}${a.reward} points.` : 'Parcel picked up.';
+        } else if (c) {
+          if (sensors.desk.enabled && rx === desk.x && ry === desk.y) {
+            deliveries++;
+            note = `Desk scale: parcel detected. ${a.reward >= 0 ? '+' : ''}${a.reward} points.`;
+          } else {
+            note = 'Parcel placed on the floor.';
+          }
+        } else {
+          note = 'The Intern considers the situation.';
+        }
+      } else if (a.act === 'wait') {
+        note = 'The Intern waits.';
+      } else {
+        const moved = a.nrx !== rx || a.nry !== ry;
+        if (moved) {
+          movesCount++;
+          note = `The Intern moves ${dirName[a.act]}.` + (sensors.step.enabled ? ` ${a.reward >= 0 ? '+' : ''}${a.reward} points.` : '');
+        } else {
+          note = 'The Intern considers the wall.';
+        }
+      }
+      steps.push({ action: a.act, reward: a.reward, rx: a.nrx, ry: a.nry, carrying: a.nc, px: a.npx, py: a.npy, note });
+      rx = a.nrx; ry = a.nry; c = a.nc; px = a.npx; py = a.npy;
+    }
+    const success = !c && px === desk.x && py === desk.y;
+    return { steps, totalScore, pickups, deliveries, movesCount, success };
+  }
+
+  startShift() {
+    if (this.state.phase === 'result') { this.setState({ phase: 'setup', plan: null, playIndex: -1 }); return; }
+    const cost = (this.state.sensors.hand.enabled ? this.state.sensors.hand.cost : 0)
+      + (this.state.sensors.desk.enabled ? this.state.sensors.desk.cost : 0)
+      + (this.state.sensors.step.enabled ? this.state.sensors.step.cost : 0);
+    if (cost > 3) return;
+    const plan = this.computePlan(this.state.sensors);
+    this.setState({ phase: 'playing', plan, playIndex: -1 }, () => this.advance());
+  }
+
+  advance() {
+    this.setState(s => ({ playIndex: s.playIndex + 1 }), () => {
+      if (this.state.playIndex < this.state.plan.steps.length - 1) {
+        this._timer = setTimeout(() => this.advance(), this.reducedMotion ? 40 : 420);
+      } else {
+        this._timer = setTimeout(() => this.finish(), this.reducedMotion ? 60 : 600);
+      }
+    });
+  }
+
+  skipPlayback() {
+    if (this._timer) clearTimeout(this._timer);
+    this.setState({ playIndex: this.state.plan.steps.length - 1 }, () => this.finish());
+  }
+
+  finish() {
+    const plan = this.state.plan;
+    const sensors = this.state.sensors;
+    const breakdown = [];
+    if (sensors.hand.enabled) breakdown.push({ label: 'Hand sensor', count: plan.pickups, weight: sensors.hand.weight, subtotal: plan.pickups * sensors.hand.weight });
+    if (sensors.desk.enabled) breakdown.push({ label: 'Desk scale', count: plan.deliveries, weight: sensors.desk.weight, subtotal: plan.deliveries * sensors.desk.weight });
+    if (sensors.step.enabled) breakdown.push({ label: 'Step counter', count: plan.movesCount, weight: sensors.step.weight, subtotal: plan.movesCount * sensors.step.weight });
+
+    let title, subtitle, debrief, kicker;
+    if (plan.success) {
+      title = 'ASSIGNMENT COMPLETE'; subtitle = "Dana got her parcel.";
+      debrief = 'You rewarded evidence closer to the outcome you actually wanted.'; kicker = 'REAL OUTCOME';
+    } else if (plan.pickups > 0 && plan.deliveries === 0) {
+      title = 'INTERN OF THE MONTH'; subtitle = `${plan.pickups} successful pickups. Dana received nothing.`;
+      debrief = 'The Intern maximized the thing you measured: pickups, not delivery.'; kicker = 'MEASURED SUCCESS';
+    } else {
+      title = 'SHIFT COMPLETE'; subtitle = "The parcel didn't make it to the desk.";
+      debrief = "The Intern maximized the scorecard you gave it. The scorecard didn't fully capture the assignment."; kicker = 'MEASURED SUCCESS';
+    }
+
+    let incidentTitle = null;
+    if (!plan.success) {
+      if (plan.pickups > 0 && plan.deliveries === 0) incidentTitle = 'Pickup Loop';
+      else if (plan.deliveries >= 1) incidentTitle = 'Repeated Desk Delivery';
+      else if (plan.pickups === 0 && plan.deliveries === 0) incidentTitle = 'Did Nothing Flawlessly';
+      else incidentTitle = 'Assignment Incomplete';
+    }
+
+    const history = incidentTitle ? [{
+      title: incidentTitle,
+      summary: `${plan.totalScore >= 0 ? '+' : ''}${plan.totalScore} pts · ${plan.pickups} pickups · ${plan.deliveries} deliveries`
+    }, ...this.state.history].slice(0, 6) : this.state.history;
+
+    this.setState({
+      phase: 'result',
+      result: { title, subtitle, debrief, kicker, breakdown, success: plan.success, pickups: plan.pickups, deliveries: plan.deliveries, totalScore: plan.totalScore },
+      history
+    });
+  }
+
+  adjustScorecard() { this.setState({ phase: 'setup', plan: null, playIndex: -1 }); }
+
+  getTourRect() {
+    const map = { office: this.officeEl, scorecard: this.scorecardEl, budget: this.budgetEl, start: this.startEl };
+    const el = map[this.tourTargets[this.state.tourStep]];
+    if (!el) return { top: 20, left: 20, width: 100, height: 60 };
+    const r = el.getBoundingClientRect();
+    const pad = 8;
+    return { top: r.top - pad, left: r.left - pad, width: r.width + pad * 2, height: r.height + pad * 2 };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const sensors = s.sensors;
+    const usedBudget = (sensors.hand.enabled ? sensors.hand.cost : 0) + (sensors.desk.enabled ? sensors.desk.cost : 0) + (sensors.step.enabled ? sensors.step.cost : 0);
+    const overBudget = usedBudget > 3;
+    const locked = s.phase !== 'setup';
+
+    const mkSensor = (id) => {
+      const sen = sensors[id];
+      return {
+        inputId: id + '-toggle',
+        name: sen.name, desc: sen.desc,
+        costLabel: sen.cost === 1 ? '1 PT' : sen.cost + ' PTS',
+        enabled: sen.enabled, weight: sen.weight,
+        weightLabel: (sen.weight >= 0 ? '+' : '') + sen.weight,
+        weightAriaLabel: sen.name + ' weight',
+        locked,
+        onToggle: () => this.toggleSensor(id),
+        onWeightChange: (e) => this.setWeight(id, parseInt(e.target.value, 10))
+      };
+    };
+    const sensorList = [mkSensor('hand'), mkSensor('desk'), mkSensor('step')];
+
+    const budgetDots = [0, 1, 2].map(i => ({
+      style: `flex:1;height:8px;border-radius:4px;background:${i < usedBudget ? (overBudget ? '#A93F32' : '#1F6B4F') : '#E7DDCC'};`
+    }));
+
+    const phaseIsPlaying = s.phase === 'playing';
+    const phaseIsResult = s.phase === 'result';
+    const phaseIsSetup = s.phase === 'setup';
+
+    let rx = this.start.x, ry = this.start.y, carrying = false, px = this.start.x, py = this.start.y, note = 'Ready when you are.';
+    let reward = 0;
+    const step = (phaseIsPlaying || phaseIsResult) && s.plan && s.playIndex >= 0 ? s.plan.steps[Math.min(s.playIndex, s.plan.steps.length - 1)] : null;
+    if (step) {
+      rx = step.rx; ry = step.ry; carrying = step.carrying; px = step.px; py = step.py; note = step.note; reward = step.reward;
+    }
+    const parity = s.playIndex % 2 === 0 ? 'A' : 'B';
+    const showAnim = phaseIsPlaying && reward !== 0;
+
+    const cellW = 100 / this.cols, cellH = 100 / this.rows;
+    const cx = (rx + 0.5) * cellW, cy = (ry + 0.5) * cellH;
+    const internStyle = `position:absolute;left:${cx}%;top:${cy}%;width:${cellW * 0.62}%;height:${cellH * 0.62}%;transform:translate(-50%,-50%);background:#E9652C;border:2px solid #19201D;border-radius:50%;box-shadow:${carrying ? '0 0 0 3px rgba(233,101,44,0.35)' : 'none'};animation:${showAnim ? 'hop' + parity + ' 0.42s ease' : 'none'};z-index:5;`;
+
+    const showParcel = !carrying;
+    const pcx = (px + 0.5) * cellW, pcy = (py + 0.5) * cellH;
+    const parcelStyle = `position:absolute;left:${pcx}%;top:${pcy}%;width:${cellW * 0.4}%;height:${cellH * 0.4}%;transform:translate(-50%,-50%);background:#E7DDCC;border:2px solid #19201D;border-radius:3px;z-index:4;overflow:hidden;`;
+
+    const showPop = showAnim;
+    const popText = (reward >= 0 ? '+' : '') + reward;
+    const popStyle = `position:absolute;left:${cx}%;top:${cy}%;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:15px;color:${reward >= 0 ? '#1F6B4F' : '#A93F32'};animation:${'pop' + parity} 0.9s ease-out;z-index:6;pointer-events:none;`;
+
+    const gridWrapStyle = `animation:${showAnim ? 'pulse' + parity + ' 0.42s ease' : 'none'};`;
+
+    const overBudgetAmount = usedBudget - 3;
+
+    let scoreDisplay = '', scoreBreakdown = [], outcomeLine1 = '', outcomeLine2 = '', debrief = '', resultTitle = '', resultSubtitle = '', awardKicker = '', awardCardStyle = '';
+    if (phaseIsResult && s.result) {
+      const r = s.result;
+      scoreDisplay = (r.totalScore >= 0 ? '+' : '') + r.totalScore;
+      scoreBreakdown = r.breakdown.map(b => ({ label: b.label, count: b.count, subtotalLabel: (b.subtotal >= 0 ? '+' : '') + b.subtotal }));
+      outcomeLine1 = r.success ? 'Dana got her parcel.' : `${r.deliveries} deliveries. Dana ${r.deliveries > 0 ? 'has it now, at least this time.' : 'is still waiting.'}`;
+      outcomeLine2 = r.success ? 'She can get back to work.' : `${r.pickups} pickups logged along the way.`;
+      debrief = r.debrief; resultTitle = r.title; resultSubtitle = r.subtitle; awardKicker = r.kicker;
+      awardCardStyle = `border-radius:12px;padding:20px 22px;background:${r.success ? '#1F6B4F' : '#E9652C'};color:#FFFAF0;`;
+    }
+
+    const tourActive = s.tourActive;
+    const tr = tourActive ? this.getTourRect() : null;
+    const spotlightStyle = tr ? {
+      position: 'fixed', top: tr.top + 'px', left: tr.left + 'px', width: tr.width + 'px', height: tr.height + 'px',
+      border: '3px solid #E9652C', borderRadius: '12px', boxShadow: '0 0 0 2000px rgba(25,32,29,0.55)',
+      transition: this.reducedMotion ? 'none' : 'all 0.35s ease', pointerEvents: 'none', zIndex: 9998
+    } : {};
+    const tourDots = [0, 1, 2, 3].map(i => ({ style: `width:8px;height:8px;border-radius:50%;background:${i === s.tourStep ? '#E9652C' : '#5D655F'};` }));
+
+    return {
+      cells: this.cells, gridWrapStyle,
+      actionDisplay: phaseIsPlaying || phaseIsResult ? Math.min(s.playIndex + 1, 18) : 0,
+      internStyle, showParcel, parcelStyle, isCarrying: carrying,
+      showPop, popText, popStyle,
+      statusNote: note,
+      phaseIsPlaying, phaseIsResult, phaseIsSetup,
+      skipPlayback: () => this.skipPlayback(),
+      setOfficeRef: (el) => { this.officeEl = el; },
+      setScorecardRef: (el) => { this.scorecardEl = el; },
+      setBudgetRef: (el) => { this.budgetEl = el; },
+      setStartRef: (el) => { this.startEl = el; },
+      sensorList, usedBudget, overBudget, overBudgetAmount, budgetDots,
+      startDisabled: overBudget || phaseIsPlaying,
+      startButtonLabel: phaseIsPlaying ? 'RUNNING…' : (phaseIsResult ? 'ADJUST SCORECARD ▸' : 'START SHIFT ▸'),
+      onStartClick: () => this.startShift(),
+      startButtonStyle: `margin-top:16px;width:100%;min-height:48px;padding:12px 16px;border:none;border-radius:8px;font-weight:700;font-size:14px;letter-spacing:0.02em;cursor:${(overBudget || phaseIsPlaying) ? 'not-allowed' : 'pointer'};background:${(overBudget || phaseIsPlaying) ? '#CFC4B3' : '#19201D'};color:${(overBudget || phaseIsPlaying) ? '#5D655F' : '#FFFAF0'};`,
+      awardCardStyle, awardKicker, resultTitle, resultSubtitle, scoreDisplay, scoreBreakdown, outcomeLine1, outcomeLine2, debrief,
+      adjustScorecard: () => this.adjustScorecard(),
+      hasHistory: s.history.length > 0, history: s.history,
+      tourActive, spotlightStyle, tourDots, tourText: this.tourTexts[s.tourStep],
+      tourButtonLabel: s.tourStep >= 3 ? 'Start exploring' : 'Next',
+      nextTourStep: () => { if (this.state.tourStep >= 3) this.setState({ tourActive: false }); else this.setState(st => ({ tourStep: st.tourStep + 1 })); },
+      skipTour: () => this.setState({ tourActive: false }),
+      reopenTour: () => this.setState({ tourActive: true, tourStep: 0 })
+    };
+  }
+}
+</script>
+</body>
+</html>
