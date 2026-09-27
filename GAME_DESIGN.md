@@ -167,6 +167,6 @@ Level 1 only, with 1 parcel, 3 sensors, the finite-horizon planner, playback, th
 
 ## 10. What this is not
 
-- Not live training: no "did it fail to learn, or is my reward bad?" confusion.
-- Not a claim about deceptive alignment, AI intent or shutdown behaviour. The Intern has no hidden goals. It has only yours.
-- Not multiplayer, not narrative-heavy, and not dependent on any AI safety vocabulary.
+- This isn't live training, so there's never a "did it fail to learn, or is my reward bad?" moment of confusion.
+- It doesn't claim anything about deceptive alignment, AI intent, or shutdown behaviour. The Intern has no hidden goals, only yours.
+- No multiplayer, no heavy narrative, and no AI safety vocabulary required going in.
