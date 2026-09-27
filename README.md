@@ -2,7 +2,7 @@
 
 Give a robot intern a scorecard and see what happens when it gets a little too good at chasing the score.
 
-**Play → [the-intern-six.vercel.app](https://the-intern-six.vercel.app)** · [How to play](https://the-intern-six.vercel.app/docs) · [Design doc](GAME_DESIGN.md)
+**Play → [playtheintern.xyz](https://playtheintern.xyz)** · [How to play](https://playtheintern.xyz/docs) · [Design doc](GAME_DESIGN.md)
 
 The Intern is a short browser game I built for the Mangrove Game Night Hackathon. It explores specification gaming and Goodhart's law through three office tasks.
 
