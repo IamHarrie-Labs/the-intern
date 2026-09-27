@@ -1,4 +1,12 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "the-intern-six.vercel.app" }],
+      "destination": "https://playtheintern.xyz/:path*",
+      "permanent": true
+    }
+  ]
 }

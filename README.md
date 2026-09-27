@@ -4,7 +4,9 @@ Give a robot intern a scorecard and see what happens when it gets a little too g
 
 **Play → [playtheintern.xyz](https://playtheintern.xyz)** · [How to play](https://playtheintern.xyz/docs) · [Design doc](GAME_DESIGN.md)
 
-The Intern is a short browser game I built for the Mangrove Game Night Hackathon. It explores specification gaming and Goodhart's law through three office tasks.
+Mangrove Game Night Hackathon · specification gaming and Goodhart's law, explored through three office tasks
+
+---
 
 You hire a robot intern, give it a task, then decide how its performance should be measured. You choose which actions earn points and how much they are worth.
 
@@ -19,6 +21,8 @@ Another level asks the intern to clean an office. Depending on what you measure,
 Then there is Test Day. You build a scorecard that works in one office, then the same scorecard gets tested on two different layouts. This is where you find out whether your definition of success still holds when the environment changes.
 
 That is the main idea behind The Intern. You give an optimizer a measure of success, and it finds ways to maximise that measure. The game lets you see what happens when the measure misses something you cared about.
+
+---
 
 ## How it works
 
@@ -75,11 +79,13 @@ For more detail on the thinking behind the game and its mechanics, see `GAME_DES
 
 ## Repository
 
-- `index.html` — the landing page, onboarding, and level structure
-- `app.js` — the planner, level definitions, and game logic
-- `styles.css` — styling
-- `docs.html` — the How to Play and AI safety explainer page
-- `assets/` — profile images
-- `GAME_DESIGN.md` — the original design document, with the mechanics and level design decisions behind it
+```
+index.html         landing page, onboarding, and level structure
+app.js             the planner, level definitions, and game logic
+styles.css         styling
+docs.html          How to Play and AI safety explainer page
+assets/            profile images
+GAME_DESIGN.md     original design document: mechanics and level design decisions
+```
 
 Built for the Mangrove Game Night Hackathon.
