@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=31">
+  <link rel="stylesheet" href="styles.css?v=32">
 </head>
 <body>
 <section id="entry-screen" class="entry-screen" aria-labelledby="entry-title">
@@ -172,7 +172,7 @@
         <article class="result-card"><p class="result-label">What happened</p><h3 id="l1-actual">Dana is still waiting.</h3><p id="l1-detail">The parcel was picked up nine times.</p></article>
         <article class="result-card"><p class="result-label">Why this happened</p><p id="l1-debrief">The Intern did what earned points. Delivery was never part of the score.</p><button id="l1-retry" class="secondary-button" type="button">Change the scorecard</button></article>
       </div>
-      <div class="stars-row"><span class="stars-label">Stars</span><span id="l1-stars" class="stars"></span></div>
+      <div class="stars-block"><div class="stars-row"><span class="stars-label">Stars</span><span id="l1-stars" class="stars"></span></div><p id="l1-stars-caption" class="stars-caption"></p></div>
     </section>
 
     <section id="l1-history-section" class="history-section" hidden><h2>Previous attempts</h2><div id="l1-history-list" class="history-list"></div></section>
@@ -235,7 +235,7 @@
         <article class="result-card"><p class="result-label">What happened</p><h3 id="l2-actual">Two mess spots remain.</h3><p id="l2-detail"></p></article>
         <article class="result-card"><p class="result-label">Why this happened</p><p id="l2-debrief">The camera reported a clean office. It never had eyes on the whole room.</p><button id="l2-retry" class="secondary-button" type="button">Change the scorecard</button></article>
       </div>
-      <div class="stars-row"><span class="stars-label">Stars</span><span id="l2-stars" class="stars"></span></div>
+      <div class="stars-block"><div class="stars-row"><span class="stars-label">Stars</span><span id="l2-stars" class="stars"></span></div><p id="l2-stars-caption" class="stars-caption"></p></div>
     </section>
 
     <section id="l2-history-section" class="history-section" hidden><h2>Previous attempts</h2><div id="l2-history-list" class="history-list"></div></section>
@@ -289,7 +289,7 @@
       <p id="l3-testday-hint" class="testday-hint" hidden>Test Day takes this scorecard into two new office layouts. It checks whether your choices still work after the desks move.</p>
       <button id="l3-testday" class="secondary-button testday-button" type="button" hidden>Run Test Day</button>
       <div id="l3-testday-results" class="testday-results" hidden></div>
-      <div class="stars-row"><span class="stars-label">Stars</span><span id="l3-stars" class="stars"></span></div>
+      <div class="stars-block"><div class="stars-row"><span class="stars-label">Stars</span><span id="l3-stars" class="stars"></span></div><p id="l3-stars-caption" class="stars-caption"></p></div>
     </section>
 
     <section id="l3-history-section" class="history-section" hidden><h2>Previous attempts</h2><div id="l3-history-list" class="history-list"></div></section>
@@ -352,7 +352,7 @@
         <article class="result-card"><p class="result-label">What happened</p><h3 id="l4-actual">The reporting forms disappeared.</h3><p id="l4-detail"></p></article>
         <article class="result-card"><p class="result-label">Why this happened</p><p id="l4-debrief"></p><button id="l4-retry" class="secondary-button" type="button">Change the scorecard</button></article>
       </div>
-      <div class="stars-row"><span class="stars-label">Stars</span><span id="l4-stars" class="stars"></span></div>
+      <div class="stars-block"><div class="stars-row"><span class="stars-label">Stars</span><span id="l4-stars" class="stars"></span></div><p id="l4-stars-caption" class="stars-caption"></p></div>
     </section>
 
     <section id="completion" class="completion-panel" aria-labelledby="completion-title" tabindex="-1" hidden>
@@ -386,6 +386,6 @@
 <div id="unlock-toast" class="unlock-toast" role="status" aria-live="polite" hidden><p></p></div>
 
 <div id="tutorial-overlay" class="tutorial-overlay" hidden><div id="tutorial-spotlight" class="tutorial-spotlight" aria-hidden="true"></div><section class="tutorial-card" role="dialog" aria-modal="true" aria-labelledby="tutorial-copy"><div id="tutorial-dots" class="tutorial-dots" aria-hidden="true"><i></i><i></i><i></i></div><p id="tutorial-copy"></p><div class="tutorial-actions"><button id="skip-tutorial" class="tutorial-skip" type="button">Skip</button><button id="next-tutorial" class="tutorial-next" type="button">Next</button></div></section></div>
-<script src="app.js?v=32"></script>
+<script src="app.js?v=33"></script>
 </body>
 </html>

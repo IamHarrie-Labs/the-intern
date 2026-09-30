@@ -328,7 +328,7 @@
       kicker:$(`#${prefix}-kicker`),title:$(`#${prefix}-title`),awardCopy:$(`#${prefix}-award-copy`),score:$(`#${prefix}-score`),
       breakdown:$(`#${prefix}-breakdown`),actual:$(`#${prefix}-actual`),detail:$(`#${prefix}-detail`),debrief:$(`#${prefix}-debrief`),
       retry:$(`#${prefix}-retry`),historySection:$(`#${prefix}-history-section`),historyList:$(`#${prefix}-history-list`),
-      stars:$(`#${prefix}-stars`),testday:$(`#${prefix}-testday`),testdayResults:$(`#${prefix}-testday-results`)
+      stars:$(`#${prefix}-stars`),starsCaption:$(`#${prefix}-stars-caption`),testday:$(`#${prefix}-testday`),testdayResults:$(`#${prefix}-testday-results`)
     };
     const sensorNames=opts.sensors;
     const controls=Object.fromEntries(sensorNames.map(name=>[name,{
@@ -421,6 +421,12 @@
         const got=!!(progress.stars[level.id]||{})[key];
         const span=document.createElement("span");span.className=`star${got?" earned":""}`;span.title=opts.starLabels[key];span.textContent="★";span.setAttribute("aria-hidden","true");
         el.stars.appendChild(span);
+      }
+      if(el.starsCaption){
+        const earnedNow=allKeys.filter(key=>(progress.stars[level.id]||{})[key]).length;
+        el.starsCaption.textContent=earnedNow===0
+          ?`Stars are bonus credit, not required to move on. What unlocks the next level is the real goal above. ${allKeys.map(key=>opts.starLabels[key]).join(" ")}`
+          :allKeys.map(key=>`${(progress.stars[level.id]||{})[key]?"★":"☆"} ${opts.starLabels[key]}`).join("  ");
       }
       if(opts.onStarsChanged)opts.onStarsChanged();
     }

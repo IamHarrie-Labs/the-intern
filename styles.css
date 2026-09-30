@@ -37,6 +37,7 @@ a{text-decoration:none}.entry-screen{position:fixed;inset:0;z-index:200;display:
 
 /* Stars */
 .stars-row{display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.stars-caption{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
 .stars-label{color:var(--muted);font-size:12px}
 .stars{display:flex;gap:4px;font-size:18px;letter-spacing:2px}
 .star{color:var(--line)}
