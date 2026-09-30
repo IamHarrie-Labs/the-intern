@@ -9,9 +9,9 @@ Mangrove Game Night Hackathon · specification gaming and Goodhart's law, explor
 ---
 
 <p align="center">
-  <img src="assets/screenshots/landing.jpg" width="32%" alt="The Intern landing page" />
-  <img src="assets/screenshots/level1-scorecard.jpg" width="32%" alt="Building a scorecard in Level 1" />
-  <img src="assets/screenshots/level1-result.jpg" width="32%" alt="A scorecard result: a good score hiding a failed delivery" />
+  <img src="assets/screenshots/landing.jpg" width="70%" alt="The Intern landing page" /><br />
+  <img src="assets/screenshots/level1-scorecard.jpg" width="70%" alt="Building a scorecard in Level 1" /><br />
+  <img src="assets/screenshots/level1-result.jpg" width="70%" alt="A scorecard result: a good score hiding a failed delivery" />
 </p>
 
 ---
