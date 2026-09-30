@@ -8,11 +8,7 @@ Mangrove Game Night Hackathon · specification gaming and Goodhart's law, explor
 
 ---
 
-<p align="center">
-  <img src="assets/screenshots/landing.jpg" width="70%" alt="The Intern landing page" /><br />
-  <img src="assets/screenshots/level1-scorecard.jpg" width="70%" alt="Building a scorecard in Level 1" /><br />
-  <img src="assets/screenshots/level1-result.jpg" width="70%" alt="A scorecard result: a good score hiding a failed delivery" />
-</p>
+<img src="assets/screenshots/landing.jpg" width="100%" alt="The Intern landing page" />
 
 ---
 
@@ -42,10 +38,14 @@ The planner is deterministic. Give it the same scorecard in the same environment
 
 The game also shows you what happened in the office before revealing the final score. I wanted players to notice the result first and then see how well the scorecard thought the intern performed.
 
+<img src="assets/screenshots/level1-scorecard.jpg" width="100%" alt="Building a scorecard in Level 1" />
+
 ## The four levels
 
 **Level 1: The Parcel**
 Get a parcel to Dana's desk. A scorecard that rewards picking up the parcel too heavily might leave the intern repeatedly lifting and dropping it without ever making the delivery.
+
+<img src="assets/screenshots/level1-result.jpg" width="100%" alt="A scorecard result: a good score hiding a failed delivery" />
 
 **Level 2: A Tidy Office**
 Your goal is to clean the office without losing the plant. Some ways of measuring cleanliness miss parts of the room or encourage the intern to treat the plant as rubbish.
