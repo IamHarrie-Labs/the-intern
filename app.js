@@ -575,6 +575,7 @@
       el.testday.hidden=!success;
       const hint=$("#l3-testday-hint");if(hint)hint.hidden=!success;
       el.testdayResults.hidden=true;el.testdayResults.innerHTML="";
+      if(success)unlock("warehouse");
     },
     incidentTitle(run){return `Training: ${run.stats.deliveries} of 3 delivered`},
     incidentSummary(run){return `${signed(run.total)} points, ${run.stats.deliveries} of 3 delivered`},
@@ -599,7 +600,6 @@
       if(allPass){
         setStars("fardesk","robust");
         if(!$("#l3-movement-enabled").checked)setStars("fardesk","minimal");
-        unlock("warehouse");
         refreshLevelNav();
         const el={stars:$("#l3-stars")};
         renderL3Stars();
