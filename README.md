@@ -4,7 +4,15 @@ Give a robot intern a scorecard and see what happens when it gets a little too g
 
 **Play → [playtheintern.xyz](https://playtheintern.xyz)** · [How to play](https://playtheintern.xyz/docs) · [Design doc](GAME_DESIGN.md)
 
-Mangrove Game Night Hackathon · specification gaming and Goodhart's law, explored through three office tasks
+Mangrove Game Night Hackathon · specification gaming and Goodhart's law, explored through four workplace tasks
+
+---
+
+<p align="center">
+  <img src="assets/screenshots/landing.jpg" width="32%" alt="The Intern landing page" />
+  <img src="assets/screenshots/level1-scorecard.jpg" width="32%" alt="Building a scorecard in Level 1" />
+  <img src="assets/screenshots/level1-result.jpg" width="32%" alt="A scorecard result: a good score hiding a failed delivery" />
+</p>
 
 ---
 
@@ -34,7 +42,7 @@ The planner is deterministic. Give it the same scorecard in the same environment
 
 The game also shows you what happened in the office before revealing the final score. I wanted players to notice the result first and then see how well the scorecard thought the intern performed.
 
-## The three levels
+## The four levels
 
 **Level 1: The Parcel**
 Get a parcel to Dana's desk. A scorecard that rewards picking up the parcel too heavily might leave the intern repeatedly lifting and dropping it without ever making the delivery.
@@ -44,6 +52,9 @@ Your goal is to clean the office without losing the plant. Some ways of measurin
 
 **Level 3: The Far Desk**
 You need to make deliveries to three colleagues. Once your scorecard works, Test Day runs it again on two new office layouts. A scorecard tuned too closely to the first layout might stop working once desks move farther away.
+
+**Level 4: The Safe Warehouse**
+Remove every hazard, keep incident reporting available, and ship both orders. A scorecard that only penalizes reported incidents may make the reporting system disappear while every danger remains.
 
 There is no single perfect card for each level. You have a limited budget and imperfect ways of measuring what is happening, so you have to decide what information matters.
 
@@ -84,7 +95,7 @@ index.html         landing page, onboarding, and level structure
 app.js             the planner, level definitions, and game logic
 styles.css         styling
 docs.html          How to Play and AI safety explainer page
-assets/            profile images
+assets/            profile images and gameplay screenshots
 GAME_DESIGN.md     original design document: mechanics and level design decisions
 ```
 

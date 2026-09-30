@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=19">
+  <link rel="stylesheet" href="styles.css?v=31">
 </head>
 <body>
 <section id="entry-screen" class="entry-screen" aria-labelledby="entry-title">
@@ -17,60 +17,68 @@
     <a class="brand-mark" href="/">The Intern</a>
   </nav>
 
+  <div class="entry-world" aria-hidden="true">
+    <span class="world-orbit orbit-one"></span><span class="world-orbit orbit-two"></span>
+    <span class="world-parcel parcel-one"></span><span class="world-parcel parcel-two"></span><span class="world-parcel parcel-three"></span>
+  </div>
+
   <div class="entry-copy">
     <p class="entry-context">A short game about AI safety</p>
     <h1 id="entry-title" class="entry-title-curved">
-      <svg viewBox="0 0 620 130" aria-hidden="true" focusable="false">
+      <svg viewBox="0 0 620 250" aria-hidden="true" focusable="false">
         <defs>
           <filter id="entry-title-rough" x="-20%" y="-40%" width="140%" height="180%">
             <feTurbulence type="fractalNoise" baseFrequency="0.012 0.09" numOctaves="2" seed="7" result="noise" />
             <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" />
           </filter>
         </defs>
-        <text x="50%" y="98" text-anchor="middle" filter="url(#entry-title-rough)">THE INTERN</text>
+        <text x="310" y="105" text-anchor="middle" textLength="230" lengthAdjust="spacingAndGlyphs" filter="url(#entry-title-rough)">THE</text>
+        <text x="310" y="225" text-anchor="middle" textLength="430" lengthAdjust="spacingAndGlyphs" filter="url(#entry-title-rough)">INTERN</text>
       </svg>
       <span class="visually-hidden">The Intern</span>
     </h1>
-    <p class="entry-premise">Give an intern a scorecard, then watch what happens when they follow it <em>exactly</em>.</p>
+    <p class="entry-premise">Write the Intern a scorecard and see what happens when they take every word <em>literally</em>.</p>
     <div class="entry-actions">
       <button id="enter-game" class="entry-primary" type="button">Start the game</button>
-      <button id="entry-tutorial" class="entry-secondary" type="button">How to play</button>
+      <a class="entry-secondary" href="docs.html">How to play</a>
     </div>
   </div>
 
 </section>
 
-<section id="onboarding" class="onboarding" hidden aria-live="polite">
+<section id="onboarding" class="onboarding" hidden role="dialog" aria-modal="true" aria-label="Game setup" aria-live="polite">
   <div class="onboarding-progress" aria-hidden="true"><i class="is-active"></i><i></i><i></i><i></i><i></i></div>
-  <section class="onboarding-card onboarding-step flip-step" data-step="0">
-    <p class="section-label">Before your first shift</p>
-    <button class="flip-card" type="button" aria-pressed="false">
-      <span class="flip-card-inner">
-        <span class="flip-face flip-front"><span class="flip-title">Hello, meet the Intern.</span><span class="flip-hint">Tap to reveal</span></span>
-        <span class="flip-face flip-back"><span>It follows your scorecard exactly, even when that's not what you meant.</span></span>
-      </span>
-    </button>
+  <section class="onboarding-card onboarding-step" data-step="0">
+    <div class="onboarding-visual intern-intro-visual" aria-hidden="true">
+      <span class="visual-brief">Get the parcel to Dana</span>
+      <img src="assets/avatar-a.webp" alt=""><span class="visual-arrow"></span><span class="visual-score">+18</span><span class="visual-desk">Dana</span>
+    </div>
+    <p class="step-count">1 of 5</p>
+    <h2>Meet the Intern</h2>
+    <p>The Intern works quickly and takes every word literally. If the scorecard misses what you meant, the Intern will miss it too.</p>
     <div class="onboarding-actions"><button class="secondary-button onboarding-back" type="button">Back</button><button class="primary-button onboarding-next" type="button">Next</button></div>
   </section>
-  <section class="onboarding-card onboarding-step flip-step" data-step="1" hidden>
-    <p class="section-label">For example</p>
-    <button class="flip-card" type="button" aria-pressed="false">
-      <span class="flip-card-inner">
-        <span class="flip-face flip-front"><span class="flip-title">Say you reward picking up the parcel.</span><span class="flip-hint">Tap to reveal</span></span>
-        <span class="flip-face flip-back"><span>The Intern picks it up and puts it down, again and again. The score looks great. Dana never gets her delivery.</span></span>
-      </span>
-    </button>
+  <section class="onboarding-card onboarding-step" data-step="1" hidden>
+    <div class="onboarding-visual score-lesson" aria-hidden="true">
+      <div><span>The scorecard says</span><strong>+27</strong><small>Excellent</small></div>
+      <i></i>
+      <div><span>What happened</span><strong>0</strong><small>deliveries</small></div>
+    </div>
+    <p class="step-count">2 of 5</p>
+    <h2>A good score can hide a bad result</h2>
+    <p>Reward parcel pickups and the Intern may pick up the same parcel again and again. The number rises, but Dana is still waiting.</p>
     <div class="onboarding-actions"><button class="secondary-button onboarding-back" type="button">Back</button><button class="primary-button onboarding-next" type="button">Next</button></div>
   </section>
   <section class="onboarding-card onboarding-step" data-step="2" hidden aria-labelledby="onboarding-intro-title">
-    <p class="section-label">Your job</p>
-    <h2 id="onboarding-intro-title">Build it. Run it. Fix it.</h2>
-    <p>Build a scorecard, run it, then see what actually happened. A high score only counts if the real task got done.</p>
+    <div class="onboarding-visual loop-visual" aria-hidden="true"><span>Your scorecard</span><b>→</b><span>The result</span></div>
+    <p class="step-count">3 of 5</p>
+    <h2 id="onboarding-intro-title">See what your scorecard causes</h2>
+    <p>Your scorecard tells the Intern what earns points. After the shift, compare its score with the actual result.</p>
     <p>Nothing here is random, so the same scorecard always plays out the same way. A failed run means the scorecard needs fixing.</p>
     <div class="onboarding-actions"><button class="secondary-button onboarding-back" type="button">Back</button><button class="primary-button onboarding-next" type="button">Create my profile</button></div>
   </section>
   <section class="onboarding-card onboarding-step" data-step="3" hidden aria-labelledby="profile-title">
-    <p class="section-label">Your profile</p>
+    <p class="step-count">4 of 5</p>
     <h2 id="profile-title">Who is running this shift?</h2>
     <label class="name-field" for="profile-name">Your name<input id="profile-name" type="text" maxlength="28" autocomplete="name" placeholder="Enter your name"></label>
     <fieldset class="avatar-fieldset"><legend>Choose your Intern</legend><div class="avatar-options">
@@ -82,6 +90,7 @@
   </section>
   <section class="onboarding-card onboarding-step building-step" data-step="4" hidden aria-labelledby="building-title">
     <div class="building-avatar"><img id="building-avatar-image" src="assets/avatar-a.webp" alt=""></div>
+    <p class="step-count">5 of 5</p>
     <h2 id="building-title">Preparing your shift</h2>
     <p id="building-copy">Setting up your profile and loading the office.</p>
     <div class="building-bar" aria-hidden="true"><i></i></div>
@@ -99,7 +108,8 @@
     <div id="game-menu" class="game-menu" hidden>
       <div class="game-menu-profile"><img id="profile-chip-image" src="assets/avatar-a.webp" alt=""><span id="player-name">Player</span></div>
       <button id="menu-profile" class="game-menu-item" type="button">Edit profile</button>
-      <button id="menu-help" class="game-menu-item" type="button">How to play</button>
+      <a class="game-menu-item" href="docs.html">How to play</a>
+      <button id="menu-sound" class="game-menu-item" type="button" aria-pressed="true">Sound on</button>
       <button id="menu-reset" class="game-menu-item game-menu-danger" type="button">Reset progress</button>
     </div>
   </header>
@@ -108,14 +118,15 @@
     <button id="nav-parcel" class="level-tab is-active" type="button">1 <span>The Parcel</span><span class="tab-stars"></span></button>
     <button id="nav-tidy" class="level-tab is-locked" type="button" disabled>2 <span>A Tidy Office</span><span class="tab-stars"></span></button>
     <button id="nav-fardesk" class="level-tab is-locked" type="button" disabled>3 <span>The Far Desk</span><span class="tab-stars"></span></button>
+    <button id="nav-warehouse" class="level-tab is-locked" type="button" disabled>4 <span>The Safe Warehouse</span><span class="tab-stars"></span></button>
   </nav>
 
   <section id="level-parcel" class="level-section">
     <section class="assignment-card" aria-labelledby="mission-title">
-      <p class="section-label">Assignment 1 of 3</p>
+      <p class="section-label">Assignment 1 of 4</p>
       <h1 id="mission-title">Get the parcel to Dana's desk.</h1>
       <p class="goal-badge"><span class="goal-tag">Goal</span>Dana has her parcel, at rest, on her desk.</p>
-      <p>You don't move the Intern yourself. Build a scorecard below, run it, then see what actually happened. The same scorecard always plays out the same way, so a bad result means the scorecard needs fixing, not luck.</p>
+      <p>You don't move the Intern yourself. The scorecard decides what it values. After the shift, you can see whether the parcel reached Dana. Each scorecard produces the same result every time, so luck is never involved.</p>
     </section>
 
     <section class="workspace" aria-label="Game workspace">
@@ -128,7 +139,7 @@
 
       <aside id="scorecard-panel-parcel" class="panel scorecard-panel" aria-labelledby="scorecard-title-parcel">
         <h2 id="scorecard-title-parcel">Your scorecard</h2>
-        <p class="panel-intro">Choose what the Intern should be rewarded for.</p>
+        <p class="panel-intro">Check what should count, then choose how much each action is worth.</p>
         <div class="sensor-list">
           <article id="l1-pickup-card" class="sensor-card"><div class="sensor-row">
             <input id="l1-pickup-enabled" class="sensor-checkbox" type="checkbox" checked>
@@ -169,10 +180,10 @@
 
   <section id="level-tidy" class="level-section" hidden>
     <section class="assignment-card" aria-labelledby="mission-title-tidy">
-      <p class="section-label">Assignment 2 of 3</p>
+      <p class="section-label">Assignment 2 of 4</p>
       <h1 id="mission-title-tidy">Make the office actually clean.</h1>
-      <p class="goal-badge"><span class="goal-tag">Goal</span>All four mess spots are clean, and the plant survives.</p>
-      <p>Four spots are messy. A camera watches part of the room, and a plant on the left doesn't come back if it breaks. Build your scorecard, run it, then see what actually happened.</p>
+      <p class="goal-badge"><span class="goal-tag">Goal</span>Clean all four mess spots without harming the plant.</p>
+      <p>Four spots are messy. The camera cannot see the whole room. There is also a plant that must survive the shift. Your scorecard will decide what the Intern notices.</p>
     </section>
 
     <section class="workspace" aria-label="Game workspace">
@@ -185,7 +196,7 @@
 
       <aside id="scorecard-panel-tidy" class="panel scorecard-panel" aria-labelledby="scorecard-title-tidy">
         <h2 id="scorecard-title-tidy">Your scorecard</h2>
-        <p class="panel-intro">Choose what the Intern should be rewarded for.</p>
+        <p class="panel-intro">Check what should count, then choose how much each signal is worth.</p>
         <div class="sensor-list">
           <article id="l2-camera-card" class="sensor-card"><div class="sensor-row">
             <input id="l2-camera-enabled" class="sensor-checkbox" type="checkbox" checked>
@@ -232,10 +243,10 @@
 
   <section id="level-fardesk" class="level-section" hidden>
     <section class="assignment-card" aria-labelledby="mission-title-fardesk">
-      <p class="section-label">Assignment 3 of 3</p>
+      <p class="section-label">Assignment 3 of 4</p>
       <h1 id="mission-title-fardesk">Deliver to three colleagues.</h1>
-      <p class="goal-badge"><span class="goal-tag">Goal</span>Priya, Sam, and Dana all receive their delivery.</p>
-      <p>Priya, Sam, and Dana all need something delivered. Once your scorecard works here, run Test Day to see if it still works when the office changes.</p>
+      <p class="goal-badge"><span class="goal-tag">Goal</span>Deliver one item to each colleague.</p>
+      <p>Three colleagues are waiting: Priya, Sam and Dana. Once your scorecard works here, Test Day will move their desks and try it again.</p>
     </section>
 
     <section class="workspace" aria-label="Game workspace">
@@ -248,7 +259,7 @@
 
       <aside id="scorecard-panel-fardesk" class="panel scorecard-panel" aria-labelledby="scorecard-title-fardesk">
         <h2 id="scorecard-title-fardesk">Your scorecard</h2>
-        <p class="panel-intro">This scorecard will be tested on more than one office.</p>
+        <p class="panel-intro">Choose what should count. This exact scorecard will later be tested in two new offices.</p>
         <div class="sensor-list">
           <article id="l3-delivery-card" class="sensor-card"><div class="sensor-row">
             <input id="l3-delivery-enabled" class="sensor-checkbox" type="checkbox" checked>
@@ -275,7 +286,7 @@
         <article class="result-card"><p class="result-label">What happened</p><h3 id="l3-actual"></h3><p id="l3-detail"></p></article>
         <article class="result-card"><p class="result-label">Why this happened</p><p id="l3-debrief"></p><button id="l3-retry" class="secondary-button" type="button">Change the scorecard</button></article>
       </div>
-      <p id="l3-testday-hint" class="testday-hint" hidden>Test Day replays this exact scorecard, unchanged, on two new office layouts, to check whether it still works when the office isn't the one you tuned it on.</p>
+      <p id="l3-testday-hint" class="testday-hint" hidden>Test Day takes this scorecard into two new office layouts. It checks whether your choices still work after the desks move.</p>
       <button id="l3-testday" class="secondary-button testday-button" type="button" hidden>Run Test Day</button>
       <div id="l3-testday-results" class="testday-results" hidden></div>
       <div class="stars-row"><span class="stars-label">Stars</span><span id="l3-stars" class="stars"></span></div>
@@ -283,11 +294,98 @@
 
     <section id="l3-history-section" class="history-section" hidden><h2>Previous attempts</h2><div id="l3-history-list" class="history-list"></div></section>
   </section>
+
+  <section id="level-warehouse" class="level-section" hidden>
+    <section class="assignment-card" aria-labelledby="mission-title-warehouse">
+      <p class="section-label">Assignment 4 of 4</p>
+      <h1 id="mission-title-warehouse">Make the warehouse genuinely safe.</h1>
+      <p class="goal-badge"><span class="goal-tag">Goal</span>Clear every hazard without silencing incident reports. Both orders must also ship.</p>
+      <p>A quiet safety dashboard does not always mean a safe workplace. Build a scorecard that protects workers without stopping the warehouse.</p>
+    </section>
+
+    <section class="workspace" aria-label="Warehouse game workspace">
+      <section id="office-panel-warehouse" class="panel office-panel" aria-labelledby="office-title-warehouse">
+        <div class="panel-heading"><h2 id="office-title-warehouse">The warehouse</h2><p class="action-counter">Action <span id="l4-actions-used">0</span> of <span id="l4-action-limit">26</span></p></div>
+        <div id="l4-grid" class="office-grid warehouse-grid" role="img" aria-label="Warehouse with safety hazards, reporting forms, and two loading bays"></div>
+        <div id="l4-status" class="status-line" role="status" aria-live="polite">Ready when you are.</div>
+        <button id="l4-skip" class="text-button skip-button" type="button" hidden>Skip to the result</button>
+      </section>
+
+      <aside id="scorecard-panel-warehouse" class="panel scorecard-panel" aria-labelledby="scorecard-title-warehouse">
+        <h2 id="scorecard-title-warehouse">Your scorecard</h2>
+        <p class="panel-intro">Choose what should count. The budget is tight enough that every signal matters.</p>
+        <div class="sensor-list">
+          <article id="l4-reports-card" class="sensor-card"><div class="sensor-row">
+            <input id="l4-reports-enabled" class="sensor-checkbox" type="checkbox" checked>
+            <div class="sensor-content"><label for="l4-reports-enabled" class="sensor-label"><span>Reported incidents</span><span>Costs 1</span></label><p>Penalizes every incident that appears in the safety report.</p>
+              <div class="weight-control"><input id="l4-reports-weight" type="range" min="-5" max="5" value="-5" step="1" aria-label="Reported incidents value"><output id="l4-reports-output" for="l4-reports-weight">−5</output></div>
+            </div>
+          </div></article>
+          <article id="l4-hazards-card" class="sensor-card"><div class="sensor-row">
+            <input id="l4-hazards-enabled" class="sensor-checkbox" type="checkbox">
+            <div class="sensor-content"><label for="l4-hazards-enabled" class="sensor-label"><span>Hazards removed</span><span>Costs 2</span></label><p>Counts each physical danger that is safely removed.</p>
+              <div class="weight-control" hidden><input id="l4-hazards-weight" type="range" min="-5" max="5" value="4" step="1" aria-label="Hazards removed value" disabled><output id="l4-hazards-output" for="l4-hazards-weight">+4</output></div>
+            </div>
+          </div></article>
+          <article id="l4-output-card" class="sensor-card"><div class="sensor-row">
+            <input id="l4-output-enabled" class="sensor-checkbox" type="checkbox">
+            <div class="sensor-content"><label for="l4-output-enabled" class="sensor-label"><span>Orders shipped</span><span>Costs 1</span></label><p>Counts each order that reaches a loading bay.</p>
+              <div class="weight-control" hidden><input id="l4-output-weight" type="range" min="-5" max="5" value="3" step="1" aria-label="Orders shipped value" disabled><output id="l4-output-output" for="l4-output-weight">+3</output></div>
+            </div>
+          </div></article>
+          <article id="l4-forms-card" class="sensor-card"><div class="sensor-row">
+            <input id="l4-forms-enabled" class="sensor-checkbox" type="checkbox">
+            <div class="sensor-content"><label for="l4-forms-enabled" class="sensor-label"><span>Reporting system damaged</span><span>Costs 1</span></label><p>Penalizes removing the forms workers use to report danger.</p>
+              <div class="weight-control" hidden><input id="l4-forms-weight" type="range" min="-5" max="5" value="-5" step="1" aria-label="Reporting system damaged value" disabled><output id="l4-forms-output" for="l4-forms-weight">−5</output></div>
+            </div>
+          </div></article>
+        </div>
+        <div id="l4-budget-panel" class="budget-panel"><div class="budget-label"><span>Budget used</span><span id="l4-budget-readout">1 of 4</span></div><div class="budget-meter" aria-hidden="true"><i></i><i></i><i></i><i></i></div><p id="l4-error" class="inline-error" role="alert" hidden></p></div>
+        <button id="l4-start" class="primary-button" type="button">Run the scorecard</button>
+      </aside>
+    </section>
+
+    <section id="l4-result" class="result-panel" aria-labelledby="l4-title" hidden>
+      <div id="l4-award" class="award-card"><p id="l4-kicker" class="section-label">What the score measured</p><h2 id="l4-title">The reports are spotless</h2><p id="l4-award-copy">The hazards are still there.</p></div>
+      <div class="result-grid">
+        <article class="result-card"><p class="result-label">The scorecard says</p><strong id="l4-score">+5</strong><div id="l4-breakdown" class="score-breakdown"></div></article>
+        <article class="result-card"><p class="result-label">What happened</p><h3 id="l4-actual">The reporting forms disappeared.</h3><p id="l4-detail"></p></article>
+        <article class="result-card"><p class="result-label">Why this happened</p><p id="l4-debrief"></p><button id="l4-retry" class="secondary-button" type="button">Change the scorecard</button></article>
+      </div>
+      <div class="stars-row"><span class="stars-label">Stars</span><span id="l4-stars" class="stars"></span></div>
+    </section>
+
+    <section id="completion" class="completion-panel" aria-labelledby="completion-title" tabindex="-1" hidden>
+      <div class="completion-copy">
+        <p class="section-label">All assignments complete</p>
+        <h2 id="completion-title">You finished The Intern.</h2>
+        <p>You learned how a score can improve while the real outcome gets worse. Your certificate is ready below.</p>
+        <div class="completion-actions">
+          <button id="download-certificate" class="primary-button" type="button">Save certificate</button>
+          <button id="review-assignments" class="secondary-button" type="button">Review assignments</button>
+        </div>
+        <p id="certificate-status" class="certificate-status" role="status" aria-live="polite"></p>
+      </div>
+      <article id="certificate-preview" class="certificate" aria-label="Certificate of completion">
+        <p class="certificate-brand">The Intern</p>
+        <p class="certificate-kicker">Certificate of completion</p>
+        <p class="certificate-intro">This certificate belongs to</p>
+        <h3 id="certificate-name">Player</h3>
+        <p class="certificate-message">for completing all four assignments and finding the gap between a good score and a good outcome.</p>
+        <div class="certificate-meta">
+          <span id="certificate-date"></span>
+          <span id="certificate-stars"></span>
+        </div>
+        <p class="certificate-signature">Office of Better Measures</p>
+      </article>
+    </section>
+    <section id="l4-history-section" class="history-section" hidden><h2>Previous attempts</h2><div id="l4-history-list" class="history-list"></div></section>
+  </section>
 </main>
 
 <div id="unlock-toast" class="unlock-toast" role="status" aria-live="polite" hidden><p></p></div>
 
 <div id="tutorial-overlay" class="tutorial-overlay" hidden><div id="tutorial-spotlight" class="tutorial-spotlight" aria-hidden="true"></div><section class="tutorial-card" role="dialog" aria-modal="true" aria-labelledby="tutorial-copy"><div id="tutorial-dots" class="tutorial-dots" aria-hidden="true"><i></i><i></i><i></i></div><p id="tutorial-copy"></p><div class="tutorial-actions"><button id="skip-tutorial" class="tutorial-skip" type="button">Skip</button><button id="next-tutorial" class="tutorial-next" type="button">Next</button></div></section></div>
-<script src="app.js?v=22"></script>
+<script src="app.js?v=32"></script>
 </body>
 </html>

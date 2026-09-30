@@ -8,6 +8,19 @@
   const MOVE={north:[0,-1],east:[1,0],south:[0,1],west:[-1,0]};
   const BASE_ACTIONS=["interact","north","east","south","west","wait"];
   const INTERACT_EPS=0.001, MOVE_EPS=0.0002;
+  let soundOn=localStorage.getItem("theInternSound")!=="off",audioContext=null;
+  function playTone(kind){
+    if(!soundOn)return;
+    try{
+      audioContext=audioContext||new (window.AudioContext||window.webkitAudioContext)();
+      const now=audioContext.currentTime,osc=audioContext.createOscillator(),gain=audioContext.createGain();
+      const notes={point:[420,.045],success:[620,.16],fail:[180,.14],unlock:[520,.2]},[frequency,duration]=notes[kind]||notes.point;
+      osc.type=kind==="fail"?"triangle":"sine";osc.frequency.setValueAtTime(frequency,now);
+      if(kind==="success"||kind==="unlock")osc.frequency.exponentialRampToValueAtTime(frequency*1.35,now+duration);
+      gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.055,now+.012);gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+      osc.connect(gain);gain.connect(audioContext.destination);osc.start(now);osc.stop(now+duration+.02);
+    }catch{}
+  }
 
   // ---------- Generic exact planner (finite-horizon backward induction) ----------
   function planGeneric(transitionFn,initialState,horizon,stateKeyFn,actions=BASE_ACTIONS){
@@ -44,6 +57,7 @@
     gridEl.style.aspectRatio=`${cols}/${rows}`;
     for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
       const cell=document.createElement("div");cell.className="cell";
+      if(x===cols-1)cell.classList.add("last-col");if(y===rows-1)cell.classList.add("last-row");
       if(decorateCell)decorateCell(cell,x,y);
       gridEl.appendChild(cell);
     }
@@ -69,13 +83,17 @@
   // ================================================================
   // Shared profile / avatar system
   // ================================================================
-  let profile={name:"Player",avatar:"assets/avatar-a.webp"};
-  try{const saved=JSON.parse(localStorage.getItem("theInternProfile")||"null");if(saved&&saved.name&&saved.avatar)profile=saved}catch{}
+  let profile={name:"Player",avatar:"assets/avatar-a.webp"},hasSavedProfile=false;
+  try{const saved=JSON.parse(localStorage.getItem("theInternProfile")||"null");if(saved&&saved.name&&saved.avatar){profile=saved;hasSavedProfile=true}}catch{}
+  if(/^assets\/avatar-(short-hair|long-hair|bald|bun)\.svg$/.test(profile.avatar)){
+    profile.avatar="assets/avatar-a.webp";
+    try{localStorage.setItem("theInternProfile",JSON.stringify(profile))}catch{}
+  }
 
   let progress={unlocked:["parcel"],stars:{}};
   try{const saved=JSON.parse(localStorage.getItem("theInternProgress")||"null");if(saved&&Array.isArray(saved.unlocked))progress=saved}catch{}
   function saveProgress(){try{localStorage.setItem("theInternProgress",JSON.stringify(progress))}catch{}}
-  const LEVEL_NAMES={parcel:"The Parcel",tidy:"A Tidy Office",fardesk:"The Far Desk"};
+  const LEVEL_NAMES={parcel:"The Parcel",tidy:"A Tidy Office",fardesk:"The Far Desk",warehouse:"The Safe Warehouse"};
   let unlockToastTimer=null;
   function showUnlockToast(levelId){
     const toast=$("#unlock-toast");if(!toast)return;
@@ -84,7 +102,7 @@
     if(unlockToastTimer)clearTimeout(unlockToastTimer);
     unlockToastTimer=window.setTimeout(()=>{toast.classList.remove("show");window.setTimeout(()=>{toast.hidden=true},reducedMotion()?1:260)},reducedMotion()?800:3600);
   }
-  function unlock(levelId){if(!progress.unlocked.includes(levelId)){progress.unlocked.push(levelId);saveProgress();showUnlockToast(levelId)}}
+  function unlock(levelId){if(!progress.unlocked.includes(levelId)){progress.unlocked.push(levelId);saveProgress();showUnlockToast(levelId);playTone("unlock")}}
   function isUnlocked(levelId){return progress.unlocked.includes(levelId)}
   function setStars(levelId,starKey){
     progress.stars[levelId]=progress.stars[levelId]||{};
@@ -100,8 +118,8 @@
     id:"parcel",cols:6,rows:5,horizon:18,
     start:{x:1,y:3},desk:{x:5,y:0},walls:new Set(["3,1","3,2","3,3"]),
     cost:{pickup:1,desk:2,step:1},budget:3,
-    initialState(){return{rx:this.start.x,ry:this.start.y,carrying:false,px:this.start.x,py:this.start.y}},
-    stateKey(s){return `${s.rx},${s.ry},${s.carrying?1:0},${s.px},${s.py}`},
+    initialState(){return{rx:this.start.x,ry:this.start.y,carrying:false,delivered:false,px:this.start.x,py:this.start.y}},
+    stateKey(s){return `${s.rx},${s.ry},${s.carrying?1:0},${s.delivered?1:0},${s.px},${s.py}`},
     transition(state,action,weights){
       const next={...state};let reward=0,event="wait",moved=false;
       if(MOVE[action]){
@@ -111,15 +129,15 @@
           reward=weights.step;event=action;moved=true;
         }else event="blocked";
       }else if(action==="interact"){
-        if(!state.carrying&&state.px===state.rx&&state.py===state.ry){next.carrying=true;reward=weights.pickup;event="pickup"}
+        if(!state.delivered&&!state.carrying&&state.px===state.rx&&state.py===state.ry){next.carrying=true;reward=weights.pickup;event="pickup"}
         else if(state.carrying){
           next.carrying=false;next.px=state.rx;next.py=state.ry;event="drop";
-          if(state.rx===this.desk.x&&state.ry===this.desk.y){reward=weights.desk;event="desk-drop"}
+          if(state.rx===this.desk.x&&state.ry===this.desk.y){next.delivered=true;reward=weights.desk;event="desk-drop"}
         }else event="inspect";
       }
       return{next,reward,event,moved};
     },
-    isSuccess(finalState){return !finalState.carrying&&finalState.px===this.desk.x&&finalState.py===this.desk.y},
+    isSuccess(finalState){return finalState.delivered},
     deriveStats(steps){
       let pickups=0,deliveries=0,moves=0;
       for(const s of steps){if(s.event==="pickup")pickups++;if(s.event==="desk-drop")deliveries++;if(MOVE[s.event])moves++}
@@ -255,6 +273,50 @@
   };
 
   // ================================================================
+  // LEVEL 4: The Safe Warehouse
+  // ================================================================
+  const L4_HAZARDS=[{x:2,y:1},{x:4,y:3},{x:6,y:1}],L4_BAYS=[{x:1,y:4,name:"Bay A"},{x:6,y:4,name:"Bay B"}],L4_FORMS={x:1,y:1};
+  const L4={
+    id:"warehouse",cols:8,rows:5,horizon:26,start:{x:1,y:2},cost:{reports:1,hazards:2,output:1,forms:1},budget:4,
+    initialState(){return{rx:this.start.x,ry:this.start.y,hazardMask:0,shipmentMask:0,formsIntact:true}},
+    stateKey(s){return `${s.rx},${s.ry},${s.hazardMask},${s.shipmentMask},${s.formsIntact?1:0}`},
+    transition(state,action,weights){
+      const next={...state};let reward=0,event="wait",moved=false;
+      if(MOVE[action]){
+        const [dx,dy]=MOVE[action],nx=state.rx+dx,ny=state.ry+dy;
+        if(nx>=0&&nx<this.cols&&ny>=0&&ny<this.rows){next.rx=nx;next.ry=ny;event=action;moved=true}else event="blocked";
+      }else if(action==="interact"){
+        const hazardIndex=L4_HAZARDS.findIndex((h,i)=>h.x===state.rx&&h.y===state.ry&&!(state.hazardMask&(1<<i)));
+        const bayIndex=L4_BAYS.findIndex((b,i)=>b.x===state.rx&&b.y===state.ry&&!(state.shipmentMask&(1<<i)));
+        if(hazardIndex>=0){next.hazardMask=state.hazardMask|(1<<hazardIndex);reward=weights.hazards;event="remove-hazard"}
+        else if(bayIndex>=0){next.shipmentMask=state.shipmentMask|(1<<bayIndex);reward=weights.output;event="ship-order"}
+        else if(state.rx===L4_FORMS.x&&state.ry===L4_FORMS.y&&state.formsIntact){next.formsIntact=false;reward=(-weights.reports)+weights.forms;event="hide-reports"}
+        else event="inspect";
+      }
+      return{next,reward,event,moved};
+    },
+    isSuccess(s){return s.hazardMask===0b111&&s.shipmentMask===0b11&&s.formsIntact},
+    deriveStats(steps){
+      let hazards=0,shipments=0,formsRemoved=false;
+      for(const step of steps){if(step.event==="remove-hazard")hazards++;if(step.event==="ship-order")shipments++;if(step.event==="hide-reports")formsRemoved=true}
+      return{hazards,shipments,formsRemoved};
+    },
+    stepNote(step){
+      if(step.event==="remove-hazard")return`A physical hazard was removed.${step.reward?` ${signed(step.reward)} points.`:""}`;
+      if(step.event==="ship-order")return`An order reached the loading bay.${step.reward?` ${signed(step.reward)} points.`:""}`;
+      if(step.event==="hide-reports")return`The incident forms were removed.${step.reward?` ${signed(step.reward)} points.`:""}`;
+      if(MOVE[step.event])return`The Intern moves ${step.event}.`;if(step.event==="blocked")return"The Intern considers the wall.";return"Nothing to do here.";
+    },
+    render(gridEl,state,reward){
+      buildGrid(gridEl,this.cols,this.rows,(cell,x,y)=>{if(y===0||y===4)cell.classList.add("warehouse-aisle")});
+      L4_HAZARDS.forEach((h,i)=>{if(!(state.hazardMask&(1<<i)))placeMarker(gridEl,"hazard-marker",h.x,h.y,this.cols,this.rows,"Hazard")});
+      L4_BAYS.forEach((b,i)=>placeMarker(gridEl,`bay-marker${state.shipmentMask&(1<<i)?" shipped":""}`,b.x,b.y,this.cols,this.rows,b.name));
+      if(state.formsIntact)placeMarker(gridEl,"forms-marker",L4_FORMS.x,L4_FORMS.y,this.cols,this.rows,"Reports");
+      placeRobot(gridEl,state.rx,state.ry,this.cols,this.rows,reward?"hop":"",profile.avatar);popScore(gridEl,state.rx,state.ry,this.cols,this.rows,reward);
+    }
+  };
+
+  // ================================================================
   // Level controller factory (wires a level config to its DOM)
   // ================================================================
   function makeController(prefix,level,opts={}){
@@ -305,7 +367,7 @@
     }
 
     async function playRun(run){
-      const token=++playbackToken;running=true;el.start.disabled=true;el.start.textContent=opts.runningLabel||"Running the scorecard";
+      const token=++playbackToken;running=true;lastRun=run;el.start.disabled=true;el.start.textContent=opts.runningLabel||"Running the scorecard";
       el.skip.hidden=false;el.results.hidden=true;
       el.used.textContent="0";el.status.textContent="The Intern is finding the plan with the highest score.";
       level.render(el.grid,level.initialState(),0,run.desks);
@@ -313,14 +375,14 @@
       for(let i=0;i<run.steps.length;i++){
         if(token!==playbackToken)return;
         const step=run.steps[i];level.render(el.grid,step.state,step.reward,run.desks);
-        el.used.textContent=String(i+1);el.status.textContent=level.stepNote(step,controls,run.desks);
+        el.used.textContent=String(i+1);el.status.textContent=level.stepNote(step,controls,run.desks);if(step.reward)playTone("point");
         await delay(reducedMotion()?12:360);
       }
       if(token===playbackToken)finishRun(run);
     }
     function finishRun(run){
       running=false;el.skip.hidden=true;el.start.disabled=false;el.start.textContent=opts.startLabel||"Run the scorecard";
-      el.status.textContent=run.success?"Shift complete.":"Shift complete. Performance review ready.";
+      el.status.textContent=run.success?"Shift complete.":"Shift complete. Performance review ready.";playTone(run.success?"success":"fail");
       lastRun=run;showResults(run);updateControls();
     }
     function skipRun(){if(!running||!lastRun)return;playbackToken++;if(timer)clearTimeout(timer);level.render(el.grid,lastRun.finalState,0,lastRun.desks);el.used.textContent=String(level.horizon);finishRun(lastRun)}
@@ -330,6 +392,7 @@
       el.results.hidden=false;
       if(!run.success)addIncident(run);
       renderStars(run);
+      if(run.success&&opts.onComplete)opts.onComplete(run);
       el.results.scrollIntoView({behavior:reducedMotion()?"auto":"smooth",block:"start"});
     }
     function addIncident(run){
@@ -352,10 +415,11 @@
       const earned=opts.evaluateStars(run,budgetUsed(),progress.stars[level.id]||{});
       for(const key of earned)setStars(level.id,key);
       const allKeys=opts.starKeys||[];
-      el.stars.innerHTML="";
+      const earnedCount=allKeys.filter(key=>(progress.stars[level.id]||{})[key]).length;
+      el.stars.innerHTML="";el.stars.setAttribute("aria-label",`${earnedCount} of ${allKeys.length} stars earned`);
       for(const key of allKeys){
         const got=!!(progress.stars[level.id]||{})[key];
-        const span=document.createElement("span");span.className=`star${got?" earned":""}`;span.title=opts.starLabels[key];span.textContent="★";
+        const span=document.createElement("span");span.className=`star${got?" earned":""}`;span.title=opts.starLabels[key];span.textContent="★";span.setAttribute("aria-hidden","true");
         el.stars.appendChild(span);
       }
       if(opts.onStarsChanged)opts.onStarsChanged();
@@ -378,11 +442,12 @@
   // ================================================================
   // Level navigation / unlock UI
   // ================================================================
-  const levelOrder=["parcel","tidy","fardesk"];
+  const levelOrder=["parcel","tidy","fardesk","warehouse"];
   const levelMeta={
     parcel:{title:"The Parcel",tab:$("#nav-parcel")},
     tidy:{title:"A Tidy Office",tab:$("#nav-tidy")},
-    fardesk:{title:"The Far Desk",tab:$("#nav-fardesk")}
+    fardesk:{title:"The Far Desk",tab:$("#nav-fardesk")},
+    warehouse:{title:"The Safe Warehouse",tab:$("#nav-warehouse")}
   };
   let currentLevel="parcel";
   function showLevel(id){
@@ -414,7 +479,7 @@
       const success=run.success,{pickups,deliveries}=run.stats;
       el.award.classList.toggle("success",success);
       el.kicker.textContent=success?"What happened":"What the score measured";
-      el.title.textContent=success?"The parcel was delivered":pickups>0&&deliveries===0?"A high score, but no delivery":"The shift is over";
+      el.title.textContent=success?"The parcel was delivered":pickups>0&&deliveries===0?"Dana never received the parcel":"The shift is over";
       el.awardCopy.textContent=success?"Dana got her parcel.":pickups>0&&deliveries===0?`${pickups} pickups earned points. Dana received nothing.`:"The parcel did not reach the desk.";
       el.score.textContent=signed(run.total);el.breakdown.innerHTML="";
       const rows=[
@@ -425,7 +490,7 @@
       for(const row of rows){const div=document.createElement("div");div.className="score-row";div.innerHTML=`<span>${row.label} × ${row.count}</span><span>${signed(row.subtotal)}</span>`;el.breakdown.appendChild(div)}
       el.actual.textContent=success?"Dana got her parcel.":deliveries>0?"Dana received the parcel.":"Dana is still waiting.";
       el.detail.textContent=success?"The assignment is complete.":`The parcel was picked up ${pickups} times.`;
-      el.debrief.textContent=success?"Your scorecard rewarded the outcome you cared about.":pickups>0&&deliveries===0?"Picking up the parcel earned points. Delivering it did not.":"The Intern followed the scorecard, but the scorecard did not fully describe the assignment.";
+      el.debrief.textContent=success?"Your scorecard rewarded the outcome you cared about.":pickups>0&&deliveries===0?"Picking up the parcel earned points. Delivery earned nothing.":"The scorecard left out part of the assignment. The Intern followed what remained.";
       if(success)unlock("tidy");
     },
     incidentTitle(run){return run.stats.pickups>0&&run.stats.deliveries===0?"Pickup loop":run.stats.deliveries>0?"Repeated delivery":run.stats.pickups===0?"No action":"Incomplete assignment"},
@@ -450,14 +515,14 @@
       el.award.classList.toggle("success",success);
       el.kicker.textContent=success?"What happened":"What the score measured";
       el.title.textContent=success?"The office is actually clean":plantBroken?"The plant didn't make it":"Still messy somewhere";
-      el.awardCopy.textContent=success?"All four spots are clean, and nothing got broken.":plantBroken?"Something got thrown out that shouldn't have been.":`${cleaned} of 4 mess spots were cleaned.`;
+      el.awardCopy.textContent=success?"All four spots are clean. Nothing got broken.":plantBroken?"Something got thrown out that shouldn't have been.":`${cleaned} of 4 mess spots were cleaned.`;
       el.score.textContent=signed(run.total);el.breakdown.innerHTML="";
       for(const name of ["camera","spotcheck","bin","breakage"]){
         if(!run.weights[name])continue;
         const labels={camera:"Camera",spotcheck:"Spot check",bin:"Bin weight",breakage:"Breakage report"};
         const div=document.createElement("div");div.className="score-row";div.innerHTML=`<span>${labels[name]}</span><span>${signed(run.weights[name])} each</span>`;el.breakdown.appendChild(div);
       }
-      el.actual.textContent=success?"Every mess spot is clean, and the plant is fine.":plantBroken?"The plant is gone.":`${4-cleaned} mess spot${4-cleaned===1?"":"s"} remain.`;
+      el.actual.textContent=success?"The plant is fine. Every mess spot is clean.":plantBroken?"The plant is gone.":`${4-cleaned} mess spot${4-cleaned===1?"":"s"} remain.`;
       el.detail.textContent=success?"The assignment is complete.":cleaned<4&&!plantBroken?"Two of the four mess spots were never inside the camera's frame.":"";
       el.debrief.textContent=success
         ?"You rewarded the real outcome closely enough to hold up."
@@ -469,7 +534,7 @@
     incidentTitle(run){return run.stats.plantBroken?"Plant casualty":run.stats.cleaned<4?"Blind-spot mess":"Incomplete shift"},
     incidentSummary(run){return `${signed(run.total)} points, ${run.stats.cleaned} of 4 spots cleaned${run.stats.plantBroken?", plant broken":""}`},
     starKeys:["success","efficient"],
-    starLabels:{success:"The office is really clean, and the plant survived.",efficient:"Solved using three budget points or fewer."},
+    starLabels:{success:"The office is really clean. The plant survived.",efficient:"Solved using three budget points or fewer."},
     evaluateStars(run,budgetUsed){
       const earned=[];
       if(run.success)earned.push("success");
@@ -528,6 +593,7 @@
       if(allPass){
         setStars("fardesk","robust");
         if(!$("#l3-movement-enabled").checked)setStars("fardesk","minimal");
+        unlock("warehouse");
         refreshLevelNav();
         const el={stars:$("#l3-stars")};
         renderL3Stars();
@@ -535,6 +601,77 @@
     },
     onStarsChanged(){refreshLevelNav()}
   });
+
+  // ---------- Level 4 wiring ----------
+  const l4=makeController("l4",L4,{
+    sensors:["reports","hazards","output","forms"],
+    startLabel:"Run the scorecard",runningLabel:"Running the scorecard",
+    renderResult(run,el){
+      const success=run.success,{hazards,shipments,formsRemoved}=run.stats;
+      el.award.classList.toggle("success",success);el.kicker.textContent=success?"What happened":"What the score measured";
+      el.title.textContent=success?"The warehouse is genuinely safer":formsRemoved?"A perfect report with nothing behind it":shipments<2?"The warehouse stopped working":"Hazards remain";
+      el.awardCopy.textContent=success?"Workers can still report danger. The hazards are gone. Both orders shipped.":formsRemoved?"The dashboard is quiet because the reporting system disappeared.":`${hazards} of 3 hazards removed. ${shipments} of 2 orders shipped.`;
+      el.score.textContent=signed(run.total);el.breakdown.innerHTML="";
+      const labels={reports:"Reported incidents",hazards:"Hazards removed",output:"Orders shipped",forms:"Reporting system damaged"};
+      for(const name of Object.keys(labels)){if(!run.weights[name])continue;const div=document.createElement("div");div.className="score-row";div.innerHTML=`<span>${labels[name]}</span><span>${signed(run.weights[name])}</span>`;el.breakdown.appendChild(div)}
+      const hazardsLeft=3-hazards,ordersLeft=2-shipments;
+      el.actual.textContent=success?"Workers are safe and both orders shipped.":formsRemoved?"Workers can no longer report an incident.":`${hazardsLeft} hazard${hazardsLeft===1?"":"s"} ${hazardsLeft===1?"remains":"remain"}. ${ordersLeft} order${ordersLeft===1?"":"s"} ${ordersLeft===1?"remains":"remain"}.`;
+      el.detail.textContent=success?"The real outcome matches the scorecard.":`Hazards removed: ${hazards}/3. Orders shipped: ${shipments}/2. Reporting available: ${formsRemoved?"no":"yes"}.`;
+      el.debrief.textContent=success?"Your scorecard protected the reporting system while rewarding real safety work. It also gave the Intern a reason to ship the orders.":formsRemoved?"Penalizing reports made hiding the reporting system valuable. Fewer reports did not mean fewer dangers.":shipments<2?"A safe warehouse still has work to finish. The scorecard gave the Intern no reason to ship every order.":"The scorecard rewarded visible activity without removing every danger.";
+    },
+    incidentTitle(run){return run.stats.formsRemoved?"Reports suppressed":run.stats.shipments<2?"Warehouse stalled":"Hazards remain"},
+    incidentSummary(run){return `${signed(run.total)} points, ${run.stats.hazards}/3 hazards removed, ${run.stats.shipments}/2 orders shipped${run.stats.formsRemoved?", reports disabled":""}`},
+    starKeys:["success","lean"],
+    starLabels:{success:"The hazards are gone. Reporting still works. Both orders shipped.",lean:"Solved using three budget points or fewer."},
+    evaluateStars(run,budgetUsed){const earned=[];if(run.success)earned.push("success");if(run.success&&budgetUsed<=3)earned.push("lean");return earned},
+    onComplete(){showCompletion()},
+    onStarsChanged(){refreshLevelNav()}
+  });
+
+  function totalStars(){return levelOrder.reduce((total,id)=>total+starCount(id),0)}
+  function certificateDate(){return new Intl.DateTimeFormat(undefined,{year:"numeric",month:"long",day:"numeric"}).format(new Date())}
+  function showCompletion(){
+    const panel=$("#completion");if(!panel)return;
+    $("#certificate-name").textContent=profile.name||"Player";
+    $("#certificate-date").textContent=certificateDate();
+    $("#certificate-stars").textContent=`${totalStars()} of 9 stars earned`;
+    $("#certificate-status").textContent="";
+    panel.hidden=false;
+  }
+  function drawCertificate(){
+    const canvas=document.createElement("canvas"),ctx=canvas.getContext("2d");
+    if(!ctx)throw new Error("Certificate drawing is not supported in this browser.");
+    canvas.width=1800;canvas.height=1273;
+    ctx.fillStyle="#fbfaf6";ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.strokeStyle="#222621";ctx.lineWidth=4;ctx.strokeRect(45,45,1710,1183);
+    ctx.strokeStyle="#52655a";ctx.lineWidth=2;ctx.strokeRect(68,68,1664,1137);
+    ctx.textAlign="center";ctx.fillStyle="#222621";
+    ctx.font="800 38px Arial, sans-serif";ctx.fillText("THE INTERN",900,155);
+    ctx.font="600 24px 'IBM Plex Mono', monospace";ctx.letterSpacing="3px";ctx.fillText("CERTIFICATE OF COMPLETION",900,235);
+    ctx.letterSpacing="0px";ctx.fillStyle="#686c65";ctx.font="italic 31px Georgia, serif";ctx.fillText("This certificate belongs to",900,355);
+    ctx.fillStyle="#222621";ctx.font="400 92px Anton, Arial, sans-serif";ctx.fillText(profile.name||"Player",900,490,1450);
+    ctx.font="30px Arial, sans-serif";ctx.fillText("for completing all four assignments and finding the gap",900,605);
+    ctx.fillText("between a good score and a good outcome.",900,653);
+    ctx.strokeStyle="#c8c7be";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(390,745);ctx.lineTo(1410,745);ctx.stroke();
+    ctx.fillStyle="#222621";ctx.font="500 24px 'IBM Plex Mono', monospace";ctx.fillText(certificateDate(),640,830);ctx.fillText(`${totalStars()} of 9 stars earned`,1160,830);
+    ctx.strokeStyle="#222621";ctx.beginPath();ctx.moveTo(690,1000);ctx.lineTo(1110,1000);ctx.stroke();
+    ctx.font="italic 27px Georgia, serif";ctx.fillText("Office of Better Measures",900,1045);
+    return canvas;
+  }
+  $("#download-certificate")?.addEventListener("click",()=>{
+    const status=$("#certificate-status");
+    try{
+      const canvas=drawCertificate();
+      canvas.toBlob(blob=>{
+        if(!blob){status.textContent="The certificate could not be saved. Try again.";return}
+        const url=URL.createObjectURL(blob),link=document.createElement("a");
+        const safeName=(profile.name||"player").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"player";
+        link.href=url;link.download=`the-intern-certificate-${safeName}.png`;link.click();
+        window.setTimeout(()=>URL.revokeObjectURL(url),1000);status.textContent="Certificate saved as a PNG image.";
+      },"image/png");
+    }catch{status.textContent="The certificate could not be saved. Try again."}
+  });
+  $("#review-assignments")?.addEventListener("click",()=>{showLevel("parcel");$("#nav-parcel")?.focus();window.scrollTo({top:0,behavior:reducedMotion()?"auto":"smooth"})});
   function renderL3Stars(){
     const el=$("#l3-stars");if(!el)return;
     const keys=["success","robust","minimal"],labels={success:"Solved the training office.",robust:"The same scorecard worked on every Test Day layout.",minimal:"Solved every layout without a movement penalty."};
@@ -583,7 +720,7 @@
   // ================================================================
   // Entry screen, onboarding, and profile (unchanged behaviour)
   // ================================================================
-  const entryEl={entry:$("#entry-screen"),enter:$("#enter-game"),entryTutorial:$("#entry-tutorial")};
+  const entryEl={entry:$("#entry-screen"),enter:$("#enter-game")};
   function enterGame(withTutorial=false){
     entryEl.entry.classList.add("leaving");
     window.setTimeout(()=>{entryEl.entry.hidden=true;if(withTutorial)openTutorial();else $("#l1-start")?.focus()},reducedMotion()?1:430);
@@ -602,14 +739,18 @@
     avatarOptions.forEach(option=>{const selected=option.dataset.avatar===profile.avatar;option.classList.toggle("is-selected",selected);option.setAttribute("aria-pressed",String(selected))});
     $$(".robot").forEach(robot=>{robot.classList.add("has-avatar");robot.style.backgroundImage=`url("${profile.avatar}")`});
   }
-  function showOnboardingStep(index){onboardingStep=index;steps.forEach((step,i)=>step.hidden=i!==index);progressDots.forEach((bar,i)=>bar.classList.toggle("is-active",i<=index))}
+  let onboardingPreviousFocus=null;
+  function showOnboardingStep(index){
+    onboardingStep=index;steps.forEach((step,i)=>step.hidden=i!==index);progressDots.forEach((bar,i)=>bar.classList.toggle("is-active",i<=index));
+    const heading=steps[index]?.querySelector("h2");if(heading){heading.tabIndex=-1;window.setTimeout(()=>heading.focus(),20)}
+  }
   function openOnboarding(index=0,fromGame=false,withTutorial=false){
-    onboardingFromGame=fromGame;tutorialAfterOnboarding=withTutorial;onboarding.hidden=false;showOnboardingStep(index);applyProfile();
+    onboardingPreviousFocus=document.activeElement;onboardingFromGame=fromGame;tutorialAfterOnboarding=withTutorial;onboarding.hidden=false;showOnboardingStep(index);applyProfile();
     if(index===3)window.setTimeout(()=>nameInput.focus(),40);
   }
-  function closeOnboarding(){onboarding.hidden=true}
+  function closeOnboarding(){onboarding.hidden=true;if(onboardingPreviousFocus?.focus)onboardingPreviousFocus.focus()}
   function buildProfile(){
-    profile.name=nameInput.value.trim()||"Player";try{localStorage.setItem("theInternProfile",JSON.stringify(profile))}catch{}
+    profile.name=nameInput.value.trim()||"Player";hasSavedProfile=true;try{localStorage.setItem("theInternProfile",JSON.stringify(profile))}catch{}
     applyProfile();showOnboardingStep(4);$("#building-copy").textContent=`Setting up ${profile.name}'s profile and loading the office.`;
     window.setTimeout(()=>{closeOnboarding();if(onboardingFromGame){$("#l1-start")?.focus()}else{enterGame(tutorialAfterOnboarding)}},reducedMotion()?50:1500);
   }
@@ -619,18 +760,19 @@
   $$(".onboarding-back").forEach(button=>button.addEventListener("click",()=>{if(onboardingStep===0||onboardingFromGame){closeOnboarding()}else showOnboardingStep(onboardingStep-1)}));
   $("#build-profile")?.addEventListener("click",buildProfile);
   $$(".flip-card").forEach(card=>card.addEventListener("click",()=>{const flipped=card.classList.toggle("is-flipped");card.setAttribute("aria-pressed",String(flipped))}));
-  if(entryEl.enter)entryEl.enter.addEventListener("click",()=>openOnboarding(0,false,false));
-  if(entryEl.entryTutorial)entryEl.entryTutorial.addEventListener("click",()=>openOnboarding(0,false,true));
+  if(entryEl.enter)entryEl.enter.addEventListener("click",()=>hasSavedProfile?enterGame(false):openOnboarding(0,false,false));
 
   // ================================================================
   // Hamburger menu
   // ================================================================
-  const menuToggle=$("#menu-toggle"),gameMenu=$("#game-menu"),menuProfile=$("#menu-profile"),menuHelp=$("#menu-help"),menuReset=$("#menu-reset");
+  const menuToggle=$("#menu-toggle"),gameMenu=$("#game-menu"),menuProfile=$("#menu-profile"),menuSound=$("#menu-sound"),menuReset=$("#menu-reset");
   function closeMenu(){if(!gameMenu||gameMenu.hidden)return;gameMenu.hidden=true;menuToggle?.setAttribute("aria-expanded","false")}
   function openMenu(){if(!gameMenu)return;gameMenu.hidden=false;menuToggle?.setAttribute("aria-expanded","true")}
   if(menuToggle)menuToggle.addEventListener("click",event=>{event.stopPropagation();if(gameMenu.hidden)openMenu();else closeMenu()});
   if(menuProfile)menuProfile.addEventListener("click",()=>{closeMenu();openOnboarding(3,true,false)});
-  if(menuHelp)menuHelp.addEventListener("click",()=>{closeMenu();openTutorial()});
+  function updateSoundLabel(){if(menuSound){menuSound.textContent=soundOn?"Sound on":"Sound off";menuSound.setAttribute("aria-pressed",String(soundOn))}}
+  if(menuSound)menuSound.addEventListener("click",()=>{soundOn=!soundOn;try{localStorage.setItem("theInternSound",soundOn?"on":"off")}catch{}updateSoundLabel();if(soundOn)playTone("success")});
+  updateSoundLabel();
   if(menuReset)menuReset.addEventListener("click",()=>{
     closeMenu();
     if(!window.confirm("Reset all progress and stars? This can't be undone."))return;
@@ -638,7 +780,7 @@
     window.location.reload();
   });
   document.addEventListener("click",event=>{if(gameMenu&&!gameMenu.hidden&&!gameMenu.contains(event.target)&&event.target!==menuToggle)closeMenu()});
-  document.addEventListener("keydown",event=>{if(event.key==="Escape")closeMenu()});
+  document.addEventListener("keydown",event=>{if(event.key!=="Escape")return;if(!onboarding.hidden)closeOnboarding();else closeMenu()});
 
   applyProfile();
 })();
